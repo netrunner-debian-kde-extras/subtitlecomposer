@@ -1,0 +1,13 @@
+# Author: José Manuel Santamaría Lema <panfaust@gmail.com>
+# Description: It's neccesary to link against the phonon library.
+# Forwarded: No, upstream have already fixed the issue.
+--- subtitlecomposer-0.5.2.orig/src/player/phonon/CMakeLists.txt
++++ subtitlecomposer-0.5.2/src/player/phonon/CMakeLists.txt
+@@ -4,3 +4,7 @@
+ 	CACHE INTERNAL EXPORTEDVARIABLE
+ )
+ 
++SET( players_phonon_LIBS
++	${KDE4_PHONON_LIBS}
++	CACHE INTERNAL EXPORTEDVARIABLE
++)

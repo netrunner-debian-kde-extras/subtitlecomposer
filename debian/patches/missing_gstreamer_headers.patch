@@ -1,0 +1,34 @@
+# Author: José Manuel Santamaría Lema <panfaust@gmail.com>
+# Description: It's neccesary to include the GStreamer and libxml2 headers.
+# Forwarded: No, upstream have already fixed the issue.
+--- subtitlecomposer-0.5.2.orig/src/main/CMakeLists.txt
++++ subtitlecomposer-0.5.2/src/main/CMakeLists.txt
+@@ -28,6 +28,12 @@
+ 	CACHE INTERNAL EXPORTEDVARIABLE
+ )
+ 
++INCLUDE_DIRECTORIES(
++	${players_gstreamer_INCLUDES}
++#	/usr/include/gstreamer-0.10
++#	/usr/include/glib-2.0
++)
++
+ KDE4_ADD_EXECUTABLE( subtitlecomposer ${subtitlecomposer_SRCS} )
+ 
+ TARGET_LINK_LIBRARIES(
+--- subtitlecomposer-0.5.2.orig/src/player/gstreamer/CMakeLists.txt
++++ subtitlecomposer-0.5.2/src/player/gstreamer/CMakeLists.txt
+@@ -1,3 +1,13 @@
++FIND_PACKAGE ( GLIB2 )
++FIND_PACKAGE ( LibXml2 )
++
++SET ( players_gstreamer_INCLUDES
++	${GSTREAMER_INCLUDE_DIR}
++	${GLIB2_INCLUDE_DIR}
++	${LIBXML2_INCLUDE_DIR}
++	CACHE INTERNAL EXPORTEDVARIABLE
++)
++
+ SET( players_gstreamer_DEFS
+ 	${GOBJECT_DEFINITIONS}
+ 	${GSTREAMER_DEFINITIONS}

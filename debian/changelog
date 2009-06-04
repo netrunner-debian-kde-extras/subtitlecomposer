@@ -1,0 +1,12 @@
+subtitlecomposer (0.5.2-1) unstable; urgency=low
+
+  * Manpage generated with kdemangen.pl and edited by hand to avoid lintian
+    warnings.
+  * Patches to fix missing library links/headers:
+    + debian/patches/missing_gstreamer_headers.patch
+    + debian/patches/missing_phonon_link.patch
+  * Patch to make the video player work:
+    + debian/patches/textoverlay_fix.patch
+  * Initial release (Closes: #516372)
+
+ -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 19 May 2009 00:47:30 +0200

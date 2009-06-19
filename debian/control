@@ -22,4 +22,4 @@ Description: Subtitles editor for KDE
  checking errors or creating translations.
  .
  Different backends (GStreamer, MPlayer, Phonon or xine) can be used to play
- the realtime video preview which helps to syncrhonize the subtitles.
+ the realtime video preview which helps to synchronize the subtitles.

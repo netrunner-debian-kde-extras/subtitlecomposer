@@ -8,6 +8,7 @@ subtitlecomposer (0.5.3-1) UNRELEASED; urgency=low
   * No build-depend on quilt since there are no patches to apply.
   * Don't install KRAZY file because upstream is not provinding it for this
     release.
+  * Bump Standards Version to 3.8.2, no changes needed.
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Fri, 19 Jun 2009 00:41:55 +0200
 

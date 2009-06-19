@@ -5,7 +5,9 @@ subtitlecomposer (0.5.3-1) UNRELEASED; urgency=low
     + debian/patches/missing_gstreamer_headers.patch
     + debian/patches/missing_phonon_link.patch
     + debian/patches/textoverlay_fix.patch
-  * Don't install KRAZY file because upstream is not provinding it for this release.
+  * No build-depend on quilt since there are no patches to apply.
+  * Don't install KRAZY file because upstream is not provinding it for this
+    release.
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Fri, 19 Jun 2009 00:41:55 +0200
 

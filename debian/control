@@ -3,7 +3,7 @@ Section: kde
 Priority: optional
 Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org> 
 Uploaders: José Manuel Santamaría Lema <panfaust@gmail.com>
-Build-Depends: debhelper (>= 7), cmake, quilt, cdbs, pkg-kde-tools,
+Build-Depends: debhelper (>= 7), cmake, cdbs, pkg-kde-tools,
  kdelibs5-dev, libgstreamer-plugins-base0.10-dev, libglib2.0-dev, libxml2-dev,
  libxine-dev, libx11-dev
 Standards-Version: 3.8.1

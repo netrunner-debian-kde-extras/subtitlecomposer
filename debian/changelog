@@ -1,6 +1,6 @@
 subtitlecomposer (0.5.3-1) unstable; urgency=low
 
-  * New upstream release
+  * New upstream release.
   * Dropped the following patches because upstream fixed the issues:
     + debian/patches/missing_gstreamer_headers.patch
     + debian/patches/missing_phonon_link.patch
@@ -24,6 +24,6 @@ subtitlecomposer (0.5.2-1) unstable; urgency=low
     + debian/patches/missing_phonon_link.patch
   * Patch to make the video player work:
     + debian/patches/textoverlay_fix.patch
-  * Initial release (Closes: #516372)
+  * Initial release (Closes: #516372).
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 19 May 2009 00:47:30 +0200

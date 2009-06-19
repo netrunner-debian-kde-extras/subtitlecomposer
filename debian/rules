@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-DEB_INSTALL_DOCS_subtitlecomposer = KRAZY
+#DEB_INSTALL_DOCS_subtitlecomposer = KRAZY
 
 include /usr/share/pkg-kde-tools/makefiles/1/cdbs/kde.mk
 include /usr/share/cdbs/1/rules/debhelper.mk

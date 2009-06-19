@@ -1,3 +1,14 @@
+subtitlecomposer (0.5.3-1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * Dropped the following patches because upstream fixed the issues:
+    + debian/patches/missing_gstreamer_headers.patch
+    + debian/patches/missing_phonon_link.patch
+    + debian/patches/textoverlay_fix.patch
+  * Don't install KRAZY file because upstream is not provinding it for this release.
+
+ -- José Manuel Santamaría Lema <panfaust@gmail.com>  Fri, 19 Jun 2009 00:41:55 +0200
+
 subtitlecomposer (0.5.2-1) unstable; urgency=low
 
   * Manpage generated with kdemangen.pl and edited by hand to avoid lintian

@@ -9,6 +9,7 @@ subtitlecomposer (0.5.3-1) UNRELEASED; urgency=low
   * Don't install KRAZY file because upstream is not provinding it for this
     release.
   * Bump Standards Version to 3.8.2, no changes needed.
+  * Added lintian overrides for ruby scripts intended to be ran using Kross.
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Fri, 19 Jun 2009 00:41:55 +0200
 

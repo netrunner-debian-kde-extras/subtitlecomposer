@@ -1,4 +1,4 @@
-subtitlecomposer (0.5.3-2) UNRELEASED; urgency=low
+subtitlecomposer (0.5.3-2) unstable; urgency=low
 
   * Added patches to avoid an FTBFS when compiling with binutils-gold:
     + 01_link_gobject.diff
@@ -6,7 +6,7 @@ subtitlecomposer (0.5.3-2) UNRELEASED; urgency=low
     + 03_link_phonon.diff
   * Bump Standards Version to 3.8.3, no changes needed.
 
- -- José Manuel Santamaría Lema <panfaust@gmail.com>  Fri, 13 Nov 2009 19:39:38 +0100
+ -- José Manuel Santamaría Lema <panfaust@gmail.com>  Fri, 13 Nov 2009 19:48:15 +0100
 
 subtitlecomposer (0.5.3-1) unstable; urgency=low
 

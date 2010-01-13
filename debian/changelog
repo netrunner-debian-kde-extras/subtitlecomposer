@@ -1,6 +1,7 @@
 subtitlecomposer (0.5.3-3) UNRELEASED; urgency=low
 
   * Switch to dpkg-source 3.0 (quilt) format.
+  * Added 04_fix_ftbfs_gcc_4_5.diff (Closes: #565078).
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Wed, 13 Jan 2010 18:58:56 +0100
 

@@ -1,3 +1,4 @@
 01_link_gobject.diff
 02_link_krosscore.diff
 03_link_phonon.diff
+04_fix_ftbfs_gcc_4_5.diff

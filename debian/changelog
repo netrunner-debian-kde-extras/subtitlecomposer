@@ -1,3 +1,9 @@
+subtitlecomposer (0.5.3-3) UNRELEASED; urgency=low
+
+  * Switch to dpkg-source 3.0 (quilt) format.
+
+ -- José Manuel Santamaría Lema <panfaust@gmail.com>  Wed, 13 Jan 2010 18:58:56 +0100
+
 subtitlecomposer (0.5.3-2) unstable; urgency=low
 
   * Added patches to avoid an FTBFS when compiling with binutils-gold:

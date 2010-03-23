@@ -8,3 +8,4 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 
 install/subtitlecomposer::
 	find debian/subtitlecomposer -type d -empty -delete
+	dh_xine

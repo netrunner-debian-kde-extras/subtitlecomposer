@@ -13,7 +13,7 @@ Vcs-Browser: http://svn.debian.org/wsvn/pkg-kde/kde-extras/subtitlecomposer/trun
 
 Package: subtitlecomposer
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${xine-x:Depends}
 Suggests: mplayer
 Description: Subtitles editor for KDE
  A text-based subtitles editor for KDE supporting basic operations (text,

@@ -1,3 +1,9 @@
+subtitlecomposer (0.5.3-4) UNRELEASED; urgency=low
+
+  * Using ${xine-x:Depends} provided by dh_xine (Closes: #575124).
+
+ -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 23 Mar 2010 21:02:29 +0100
+
 subtitlecomposer (0.5.3-3) unstable; urgency=low
 
   * Switch to dpkg-source 3.0 (quilt) format.

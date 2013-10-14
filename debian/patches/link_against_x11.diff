@@ -1,0 +1,16 @@
+--- a/src/player/xine/CMakeLists.txt
++++ b/src/player/xine/CMakeLists.txt
+@@ -1,3 +1,5 @@
++find_package(X11)
++
+ SET( players_xine_INCLUDE_DIR
+ 	${XINE_INCLUDE_DIR}
+ 	CACHE INTERNAL EXPORTEDVARIABLE
+@@ -10,6 +12,7 @@ SET( players_xine_DEFS
+ 
+ SET( players_xine_LIBS
+ 	${XINE_LIBRARY}
++	${X11_LIBRARIES}
+ 	CACHE INTERNAL EXPORTEDVARIABLE
+ )
+ 

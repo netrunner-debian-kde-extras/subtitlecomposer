@@ -2,3 +2,4 @@
 02_link_krosscore.diff
 03_link_phonon.diff
 04_fix_ftbfs_gcc_4_5.diff
+link_against_x11.diff

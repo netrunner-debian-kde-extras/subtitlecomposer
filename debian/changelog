@@ -5,6 +5,7 @@ subtitlecomposer (0.5.3-4) UNRELEASED; urgency=low
   * Build depend on libxine2-dev instead of libxine-dev (Closes:
     #724751).
   * Add link_against_x11.diff.
+  * Bump Standards-Version to 3.9.4, no changes required.
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 23 Mar 2010 21:02:29 +0100
 

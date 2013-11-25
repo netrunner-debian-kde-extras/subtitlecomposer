@@ -12,6 +12,7 @@ subtitlecomposer (0.5.3-4) UNRELEASED; urgency=low
   * Update vcs fields.
   * Migrate cdbs to dh 9.
   * Add myself as uploader.
+  * Add lintian override, xine addon provided by libxine2-dev.
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 23 Mar 2010 21:02:29 +0100
 

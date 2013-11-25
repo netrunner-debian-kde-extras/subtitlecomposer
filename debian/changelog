@@ -1,12 +1,15 @@
 subtitlecomposer (0.5.3-4) UNRELEASED; urgency=low
 
+  [ José Manuel Santamaría Lema ]
   * Using ${xine-x:Depends} provided by dh_xine (Closes: #575124).
   * Point debian/control Vcs fields to the new Git repository.
-  * Build depend on libxine2-dev instead of libxine-dev (Closes:
-    #724751).
+  * Build depend on libxine2-dev instead of libxine-dev (Closes: #724751).
   * Add link_against_x11.diff (Closes: #713576).
   * Bump Standards-Version to 3.9.4, no changes required.
   * Update lintian overrides.
+
+  [ Maximiliano Curia ]
+  * Update vcs fields.
 
  -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 23 Mar 2010 21:02:29 +0100
 

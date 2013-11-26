@@ -1,4 +1,4 @@
-subtitlecomposer (0.5.3-4) UNRELEASED; urgency=low
+subtitlecomposer (0.5.3-4) unstable; urgency=low
 
   [ José Manuel Santamaría Lema ]
   * Using ${xine-x:Depends} provided by dh_xine (Closes: #575124).
@@ -14,7 +14,7 @@ subtitlecomposer (0.5.3-4) UNRELEASED; urgency=low
   * Add myself as uploader.
   * Add lintian override, xine addon provided by libxine2-dev.
 
- -- José Manuel Santamaría Lema <panfaust@gmail.com>  Tue, 23 Mar 2010 21:02:29 +0100
+ -- Maximiliano Curia <maxy@debian.org>  Tue, 26 Nov 2013 10:26:58 +0100
 
 subtitlecomposer (0.5.3-3) unstable; urgency=low
 

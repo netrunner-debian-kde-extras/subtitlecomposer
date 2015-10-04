@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(
 	${config_INCLUDE_DIR}
 	${core_INCLUDE_DIR}
 	${formats_INCLUDE_DIR}
-	${players_INCLUDE_DIR}
+	${services_INCLUDE_DIR}
 	${widgets_INCLUDE_DIR}
 )
 
@@ -19,7 +19,7 @@ SET( subtitlecomposer_SRCS
 	${config_SRCS}
 	${core_SRCS}
 	${formats_SRCS}
-	${players_SRCS}
+	${services_SRCS}
 	${widgets_SRCS}
 	${main_configs_SRCS}
 	${main_dialogs_SRCS}
@@ -33,6 +33,7 @@ SET( subtitlecomposer_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/errorsdialog.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/errorswidget.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lineswidget.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/statusbar.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/playerwidget.cpp
@@ -46,12 +47,14 @@ TARGET_LINK_LIBRARIES(
 	${KDE4_KDEUI_LIBS}
 	${KDE4_KHTML_LIBS}
 	${KDE4_KFILE_LIBS}
+	${KDE4_KROSSCORE_LIBS}
 	${KDE4_KROSSUI_LIBS}
+	${KDE4_PHONON_LIBS}
 	${common_LIBS}
 	${config_LIBS}
 	${core_LIBS}
 	${formats_LIBS}
-	${players_LIBS}
+	${services_LIBS}
 	${widgets_LIBS}
 )
 
@@ -60,7 +63,7 @@ ADD_DEFINITIONS(
 	${config_DEFS}
 	${core_DEFS}
 	${formats_DEFS}
-	${players_DEFS}
+	${services_DEFS}
 	${widgets_DEFS}
 )
 

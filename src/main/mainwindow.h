@@ -21,49 +21,46 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../core/subtitle.h"
 
 #include <KXmlGuiWindow>
 
-namespace SubtitleComposer
+class QSplitter;
+
+namespace SubtitleComposer {
+class PlayerWidget;
+class LinesWidget;
+class CurrentLineWidget;
+class StatusBar2;
+
+class MainWindow : public KXmlGuiWindow
 {
-	class PlayerWidget;
-	class LinesWidget;
-	class CurrentLineWidget;
-	class AudioLevelsWidget;
+	Q_OBJECT
 
-	class MainWindow : public KXmlGuiWindow
-	{
-		Q_OBJECT
+	friend class Application;
 
-		friend class Application;
+public:
+	MainWindow();
+	virtual ~MainWindow();
 
-		public:
+	void loadConfig();
+	void saveConfig();
 
-			MainWindow();
-			virtual ~MainWindow();
+public slots:
+	void setSubtitle(Subtitle *subtitle = 0);
 
-			void loadConfig();
-			void saveConfig();
+protected:
+	virtual bool queryClose();
 
-		public slots:
-
-			void setSubtitle( Subtitle* subtitle=0 );
-
-		protected:
-
-			virtual bool queryClose();
-
-		protected:
-
-			//AudioLevelsWidget* m_audiolevelsWidget;
-			PlayerWidget* m_playerWidget;
-			LinesWidget* m_linesWidget;
-			CurrentLineWidget* m_curLineWidget;
-	};
+protected:
+	QSplitter *m_splitter;
+	PlayerWidget *m_playerWidget;
+	LinesWidget *m_linesWidget;
+	CurrentLineWidget *m_curLineWidget;
+	StatusBar2 *m_statusBar;
+};
 }
-
 #endif

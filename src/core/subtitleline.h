@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "action.h"
@@ -32,239 +32,223 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class Subtitle;
+
+class SubtitleLine : public QObject
 {
-	class Subtitle;
+	Q_OBJECT
 
-	class SubtitleLine : public QObject
-	{
-		Q_OBJECT
+	friend class Subtitle;
+	friend class SubtitleAction;
+	friend class SwapLinesTextsAction;
+	friend class SubtitleLineAction;
+	friend class SetLinePrimaryTextAction;
+	friend class SetLineSecondaryTextAction;
+	friend class SetLineTextsAction;
+	friend class SetLineShowTimeAction;
+	friend class SetLineHideTimeAction;
+	friend class SetLineTimesAction;
+	friend class SetLineStyleFlagsAction;
+	friend class SetLineErrorsAction;
+	friend class ToggleLineMarkedAction;
+	friend class Format;
 
-		friend class Subtitle;
-		friend class SubtitleAction;
-		friend class SwapLinesTextsAction;
-		friend class SubtitleLineAction;
-		friend class SetLinePrimaryTextAction;
-		friend class SetLineSecondaryTextAction;
-		friend class SetLineTextsAction;
-		friend class SetLineShowTimeAction;
-		friend class SetLineHideTimeAction;
-		friend class SetLineTimesAction;
-		friend class SetLineStyleFlagsAction;
-		friend class SetLineErrorsAction;
-		friend class ToggleLineMarkedAction;
+public:
+	typedef enum {
+		Primary = 0,
+		Secondary,
+		Both,
+		TextTargetSIZE
+	} TextTarget;
 
-		friend class Format;
+	typedef enum {
+		EmptyPrimaryTextID = 0,         // Empty primary text
+		EmptySecondaryTextID,           // Empty secondary text
+		MaxPrimaryCharsID,              // Too many characters in primary text
+		MaxSecondaryCharsID,            // Too many characters in secondary text
+		MaxPrimaryLinesID,              // Too many line breaks in primary text
+		MaxSecondaryLinesID,            // Too many line breaks in secondary text
+		PrimaryUnneededSpacesID,                // Unnecessary spaces in primary text
+		SecondaryUnneededSpacesID,              // Unnecessary spaces in secondary text
+		PrimaryUnneededDashID,          // Unnecessary dash (-) in primary text
+		SecondaryUnneededDashID,                // Unnecessary dash (-) in secondary text
+		PrimaryCapitalAfterEllipsisID,          // Capital letter after ellipsis in primary text
+		SecondaryCapitalAfterEllipsisID,                // Capital letter after ellipsis in secondary text
+		MinDurationPerPrimaryCharID,            // Too short duration per primary text character
+		MinDurationPerSecondaryCharID,          // Too short duration per secondary text character
+		MaxDurationPerPrimaryCharID,            // Too long duration per primary text character
+		MaxDurationPerSecondaryCharID,          // Too long duration per secondary text character
+		MinDurationID,                  // Too short duration
+		MaxDurationID,                  // Too long duration
+		OverlapsWithNextID,             // Overlaps with next line
+		UntranslatedTextID,             // Primary and translation text are the same
+		UserMarkID,
+		ErrorSIZE,
+		ErrorUNKNOWN
+	} ErrorID;
 
-		public:
+	typedef enum {
+		EmptyPrimaryText = 0x1 << EmptyPrimaryTextID,
+		EmptySecondaryText = 0x1 << EmptySecondaryTextID,
+		MaxPrimaryChars = 0x1 << MaxPrimaryCharsID,
+		MaxSecondaryChars = 0x1 << MaxSecondaryCharsID,
+		MaxPrimaryLines = 0x1 << MaxPrimaryLinesID,
+		MaxSecondaryLines = 0x1 << MaxSecondaryLinesID,
+		PrimaryUnneededSpaces = 0x1 << PrimaryUnneededSpacesID,
+		SecondaryUnneededSpaces = 0x1 << SecondaryUnneededSpacesID,
+		PrimaryUnneededDash = 0x1 << PrimaryUnneededDashID,
+		SecondaryUnneededDash = 0x1 << SecondaryUnneededDashID,
+		PrimaryCapitalAfterEllipsis = 0x1 << PrimaryCapitalAfterEllipsisID,
+		SecondaryCapitalAfterEllipsis = 0x1 << SecondaryCapitalAfterEllipsisID,
+		MinDurationPerPrimaryChar = 0x1 << MinDurationPerPrimaryCharID,
+		MinDurationPerSecondaryChar = 0x1 << MinDurationPerSecondaryCharID,
+		MaxDurationPerPrimaryChar = 0x1 << MaxDurationPerPrimaryCharID,
+		MaxDurationPerSecondaryChar = 0x1 << MaxDurationPerSecondaryCharID,
+		MinDuration = 0x1 << MinDurationID,
+		MaxDuration = 0x1 << MaxDurationID,
+		OverlapsWithNext = 0x1 << OverlapsWithNextID,
+		UntranslatedText = 0x1 << UntranslatedTextID,
+		UserMark = 0x1 << UserMarkID,
 
-			typedef enum {
-				Primary = 0,
-				Secondary,
-				Both,
-				TextTargetSIZE
-			} TextTarget;
+		PrimaryOnlyErrors = EmptyPrimaryText | MaxPrimaryChars | MaxPrimaryLines | PrimaryUnneededSpaces | PrimaryUnneededDash | PrimaryCapitalAfterEllipsis | MinDurationPerPrimaryChar | MaxDurationPerPrimaryChar,
 
-			typedef enum {
-				EmptyPrimaryTextID = 0,				// Empty primary text
-				EmptySecondaryTextID,				// Empty secondary text
-				MaxPrimaryCharsID,					// Too many characters in primary text
-				MaxSecondaryCharsID,				// Too many characters in secondary text
-				MaxPrimaryLinesID,					// Too many line breaks in primary text
-				MaxSecondaryLinesID,				// Too many line breaks in secondary text
-				PrimaryUnneededSpacesID,			// Unnecessary spaces in primary text
-				SecondaryUnneededSpacesID,			// Unnecessary spaces in secondary text
-				PrimaryUnneededDashID,				// Unnecessary dash (-) in primary text
-				SecondaryUnneededDashID,			// Unnecessary dash (-) in secondary text
-				PrimaryCapitalAfterEllipsisID,		// Capital letter after ellipsis in primary text
-				SecondaryCapitalAfterEllipsisID,	// Capital letter after ellipsis in secondary text
-				MinDurationPerPrimaryCharID	,		// Too short duration per primary text character
-				MinDurationPerSecondaryCharID,		// Too short duration per secondary text character
-				MaxDurationPerPrimaryCharID	,		// Too long duration per primary text character
-				MaxDurationPerSecondaryCharID,		// Too long duration per secondary text character
-				MinDurationID,						// Too short duration
-				MaxDurationID,						// Too long duration
-				OverlapsWithNextID,					// Overlaps with next line
-				UntranslatedTextID,					// Primary and translation text are the same
-				UserMarkID,
-				ErrorSIZE,
-				ErrorUNKNOWN
-			} ErrorID;
+		SecondaryOnlyErrors = EmptySecondaryText | MaxSecondaryChars | MaxSecondaryLines | SecondaryUnneededSpaces | SecondaryUnneededDash | SecondaryCapitalAfterEllipsis | MinDurationPerSecondaryChar | MaxDurationPerSecondaryChar | UntranslatedText,
 
-			typedef enum {
-				EmptyPrimaryText =					0x1 << EmptyPrimaryTextID,
-				EmptySecondaryText =				0x1 << EmptySecondaryTextID,
-				MaxPrimaryChars =					0x1 << MaxPrimaryCharsID,
-				MaxSecondaryChars =					0x1 << MaxSecondaryCharsID,
-				MaxPrimaryLines =					0x1 << MaxPrimaryLinesID,
-				MaxSecondaryLines =					0x1 << MaxSecondaryLinesID,
-				PrimaryUnneededSpaces =				0x1 << PrimaryUnneededSpacesID,
-				SecondaryUnneededSpaces =			0x1 << SecondaryUnneededSpacesID,
-				PrimaryUnneededDash =				0x1 << PrimaryUnneededDashID,
-				SecondaryUnneededDash =				0x1 << SecondaryUnneededDashID,
-				PrimaryCapitalAfterEllipsis =		0x1 << PrimaryCapitalAfterEllipsisID,
-				SecondaryCapitalAfterEllipsis =		0x1 << SecondaryCapitalAfterEllipsisID,
-				MinDurationPerPrimaryChar =			0x1 << MinDurationPerPrimaryCharID,
-				MinDurationPerSecondaryChar =		0x1 << MinDurationPerSecondaryCharID,
-				MaxDurationPerPrimaryChar =			0x1 << MaxDurationPerPrimaryCharID,
-				MaxDurationPerSecondaryChar =		0x1 << MaxDurationPerSecondaryCharID,
-				MinDuration =						0x1 << MinDurationID,
-				MaxDuration =						0x1 << MaxDurationID,
-				OverlapsWithNext =					0x1 << OverlapsWithNextID,
-				UntranslatedText = 					0x1 << UntranslatedTextID,
-				UserMark = 							0x1 << UserMarkID,
+		SharedErrors = MinDuration | MaxDuration | OverlapsWithNext | UserMark,
 
-				PrimaryOnlyErrors =		EmptyPrimaryText|MaxPrimaryChars|MaxPrimaryLines|PrimaryUnneededSpaces|
-										PrimaryUnneededDash|PrimaryCapitalAfterEllipsis|MinDurationPerPrimaryChar|
-										MaxDurationPerPrimaryChar,
+		AllErrors = PrimaryOnlyErrors | SecondaryOnlyErrors | SharedErrors,
 
-				SecondaryOnlyErrors =	EmptySecondaryText|MaxSecondaryChars|MaxSecondaryLines|SecondaryUnneededSpaces|
-										SecondaryUnneededDash|SecondaryCapitalAfterEllipsis|MinDurationPerSecondaryChar|
-										MaxDurationPerSecondaryChar|UntranslatedText,
+		TimesErrors = MinDuration | MaxDuration | MinDurationPerPrimaryChar | MinDurationPerSecondaryChar | MaxDurationPerPrimaryChar | MaxDurationPerSecondaryChar | OverlapsWithNext,
 
-				SharedErrors =			MinDuration|MaxDuration|OverlapsWithNext|UserMark,
+		TextErrors = EmptyPrimaryText | EmptySecondaryText | MaxPrimaryChars | MaxSecondaryChars | MaxPrimaryLines | MaxSecondaryLines | PrimaryUnneededSpaces | SecondaryUnneededSpaces | PrimaryUnneededDash | SecondaryUnneededDash | PrimaryCapitalAfterEllipsis | SecondaryCapitalAfterEllipsis | MinDurationPerPrimaryChar | MinDurationPerSecondaryChar | MaxDurationPerPrimaryChar | MaxDurationPerSecondaryChar | UntranslatedText
+	} ErrorFlag;
 
-				AllErrors =				PrimaryOnlyErrors|SecondaryOnlyErrors|SharedErrors,
+	static int bitsCount(unsigned int bitFlags);
 
-				TimesErrors =			MinDuration|MaxDuration|MinDurationPerPrimaryChar|MinDurationPerSecondaryChar|
-										MaxDurationPerPrimaryChar|MaxDurationPerSecondaryChar|OverlapsWithNext,
+	static ErrorFlag errorFlag(ErrorID id);
+	static ErrorID errorID(ErrorFlag flag);
 
-				TextErrors =			EmptyPrimaryText|EmptySecondaryText|MaxPrimaryChars|MaxSecondaryChars|
-										MaxPrimaryLines|MaxSecondaryLines|PrimaryUnneededSpaces|SecondaryUnneededSpaces|
-										PrimaryUnneededDash|SecondaryUnneededDash|PrimaryCapitalAfterEllipsis|
-										SecondaryCapitalAfterEllipsis|MinDurationPerPrimaryChar|MinDurationPerSecondaryChar|
-										MaxDurationPerPrimaryChar|MaxDurationPerSecondaryChar|UntranslatedText,
-			} ErrorFlag;
+	static const QString & simpleErrorText(SubtitleLine::ErrorFlag errorFlag);
+	static const QString & simpleErrorText(SubtitleLine::ErrorID errorID);
 
-			static int bitsCount( unsigned int bitFlags );
+	QString fullErrorText(SubtitleLine::ErrorFlag errorFlag) const;
+	QString fullErrorText(SubtitleLine::ErrorID errorID) const;
 
-			static ErrorFlag errorFlag( ErrorID id );
-			static ErrorID errorID( ErrorFlag flag );
+	explicit SubtitleLine(const SString &pText = SString(), const SString &sText = SString());
+	SubtitleLine(const SString &pText, const Time &showTime, const Time &hideTime);
+	SubtitleLine(const SString &pText, const SString &sText, const Time &showTime, const Time &hideTime);
+	SubtitleLine(const SubtitleLine &line);
+	SubtitleLine & operator=(const SubtitleLine &line);
+	virtual ~SubtitleLine();
 
-			static const QString& simpleErrorText( SubtitleLine::ErrorFlag errorFlag );
-			static const QString& simpleErrorText( SubtitleLine::ErrorID errorID );
+	int number() const;
+	int index() const;
 
-			QString fullErrorText( SubtitleLine::ErrorFlag errorFlag ) const;
-			QString fullErrorText( SubtitleLine::ErrorID errorID ) const;
+	Subtitle * subtitle();
+	const Subtitle * subtitle() const;
 
-			explicit SubtitleLine( const SString& pText=SString(), const SString& sText=SString() );
-			SubtitleLine( const SString& pText, const Time& showTime, const Time& hideTime );
-			SubtitleLine( const SString& pText, const SString& sText, const Time& showTime, const Time& hideTime );
-			SubtitleLine( const SubtitleLine& line );
-			SubtitleLine& operator=( const SubtitleLine& line );
-			virtual ~SubtitleLine();
+	SubtitleLine * prevLine();
+	SubtitleLine * nextLine();
 
-			int number() const;
-			int index() const;
+	const SString & primaryText() const;
+	void setPrimaryText(const SString &pText);
 
-			Subtitle* subtitle();
-			const Subtitle* subtitle() const;
+	const SString & secondaryText() const;
+	void setSecondaryText(const SString &sText);
 
-			SubtitleLine* prevLine();
-			SubtitleLine* nextLine();
+	void setTexts(const SString &pText, const SString &sText);
 
-			const SString& primaryText() const;
-			void setPrimaryText( const SString& pText );
+	static SString fixPunctuation(const SString &text, bool spaces, bool quotes, bool englishI, bool ellipsis, bool *cont);
+	static SString breakText(const SString &text, int minLengthForBreak);
+	static QString simplifyTextWhiteSpace(QString text);
+	static SString simplifyTextWhiteSpace(SString text);
 
-			const SString& secondaryText() const;
-			void setSecondaryText( const SString& sText );
+	void breakText(int minLengthForBreak, TextTarget target);
+	void unbreakText(TextTarget target);
+	void simplifyTextWhiteSpace(TextTarget target);
 
-			void setTexts( const SString& pText, const SString& sText );
+	Time showTime() const;
+	void setShowTime(const Time &showTime);
 
-			static SString fixPunctuation(const SString& text, bool spaces, bool quotes, bool englishI, bool ellipsis, bool*cont);
-			static SString breakText( const SString& text, int minLengthForBreak );
-			static QString simplifyTextWhiteSpace( QString text );
-			static SString simplifyTextWhiteSpace( SString text );
+	Time hideTime() const;
+	void setHideTime(const Time &hideTime);
 
-			void breakText( int minLengthForBreak, TextTarget target );
-			void unbreakText( TextTarget target );
-			void simplifyTextWhiteSpace( TextTarget target );
+	Time durationTime() const;
+	void setDurationTime(const Time &durationTime);
 
-			Time showTime() const;
-			void setShowTime( const Time& showTime );
+	void setTimes(const Time &showTime, const Time &hideTime);
 
-			Time hideTime() const;
-			void setHideTime( const Time& hideTime );
+	int primaryCharacters() const;
+	int primaryWords() const;
+	int primaryLines() const;
 
-			Time durationTime() const;
-			void setDurationTime( const Time& durationTime );
+	int secondaryCharacters() const;
+	int secondaryWords() const;
+	int secondaryLines() const;
 
-			void setTimes( const Time& showTime, const Time& hideTime );
+	static Time autoDuration(const QString &text, int msecsPerChar, int msecsPerWord, int msecsPerLine);
+	Time autoDuration(int msecsPerChar, int msecsPerWord, int msecsPerLine, TextTarget calculationTarget);
 
-			int primaryCharacters() const;
-			int primaryWords() const;
-			int primaryLines() const;
+	void shiftTimes(long mseconds);
+	void adjustTimes(double shiftMseconds, double scaleFactor);
 
-			int secondaryCharacters() const;
-			int secondaryWords() const;
-			int secondaryLines() const;
+	int errorFlags() const;
+	int errorCount() const;
+	void setErrorFlags(int errorFlags);
+	void setErrorFlags(int errorFlags, bool value);
 
-			static Time autoDuration( const QString& text, int msecsPerChar, int msecsPerWord, int msecsPerLine );
-			Time autoDuration( int msecsPerChar, int msecsPerWord, int msecsPerLine, TextTarget calculationTarget );
+	bool checkEmptyPrimaryText(bool update = true);
+	bool checkEmptySecondaryText(bool update = true);
+	bool checkUntranslatedText(bool update = true);
+	bool checkOverlapsWithNext(bool update = true);
 
-			void shiftTimes( long mseconds );
-			void adjustTimes( long shiftMseconds, double scaleFactor );
+	bool checkMinDuration(int minMsecs, bool update = true);
+	bool checkMaxDuration(int maxMsecs, bool update = true);
 
-			int errorFlags() const;
-			int errorCount() const;
-			void setErrorFlags( int errorFlags );
-			void setErrorFlags( int errorFlags, bool value );
+	bool checkMinDurationPerPrimaryChar(int minMsecsPerChar, bool update = true);
+	bool checkMinDurationPerSecondaryChar(int minMsecsPerChar, bool update = true);
+	bool checkMaxDurationPerPrimaryChar(int maxMsecsPerChar, bool update = true);
+	bool checkMaxDurationPerSecondaryChar(int maxMsecsPerChar, bool update = true);
 
-			bool checkEmptyPrimaryText( bool update=true );
-			bool checkEmptySecondaryText( bool update=true );
-			bool checkUntranslatedText( bool update=true );
-			bool checkOverlapsWithNext( bool update=true );
+	bool checkMaxPrimaryChars(int maxCharacters, bool update = true);
+	bool checkMaxSecondaryChars(int maxCharacters, bool update = true);
+	bool checkMaxPrimaryLines(int maxLines, bool update = true);
+	bool checkMaxSecondaryLines(int maxLines, bool update = true);
 
-			bool checkMinDuration( int minMsecs, bool update=true );
-			bool checkMaxDuration( int maxMsecs, bool update=true );
+	bool checkPrimaryUnneededSpaces(bool update = true);
+	bool checkSecondaryUnneededSpaces(bool update = true);
+	bool checkPrimaryCapitalAfterEllipsis(bool update = true);
+	bool checkSecondaryCapitalAfterEllipsis(bool update = true);
+	bool checkPrimaryUnneededDash(bool update = true);
+	bool checkSecondaryUnneededDash(bool update = true);
 
-			bool checkMinDurationPerPrimaryChar( int minMsecsPerChar, bool update=true );
-			bool checkMinDurationPerSecondaryChar( int minMsecsPerChar, bool update=true );
-			bool checkMaxDurationPerPrimaryChar( int maxMsecsPerChar, bool update=true );
-			bool checkMaxDurationPerSecondaryChar( int maxMsecsPerChar, bool update=true );
+	int check(int errorFlagsToCheck, int minDurationMsecs, int maxDurationMsecs, int minMsecsPerChar, int maxMsecsPerChar, int maxChars, int maxLines, bool update = true);
 
-			bool checkMaxPrimaryChars( int maxCharacters, bool update=true );
-			bool checkMaxSecondaryChars( int maxCharacters, bool update=true );
-			bool checkMaxPrimaryLines( int maxLines, bool update=true );
-			bool checkMaxSecondaryLines( int maxLines, bool update=true );
+signals:
+	void primaryTextChanged(const SString &text);
+	void secondaryTextChanged(const SString &text);
+	void showTimeChanged(const Time &showTime);
+	void hideTimeChanged(const Time &hideTime);
+	void errorFlagsChanged(int errorFlags);
 
-			bool checkPrimaryUnneededSpaces( bool update=true );
-			bool checkSecondaryUnneededSpaces( bool update=true );
-			bool checkPrimaryCapitalAfterEllipsis( bool update=true );
-			bool checkSecondaryCapitalAfterEllipsis( bool update=true );
-			bool checkPrimaryUnneededDash( bool update=true );
-			bool checkSecondaryUnneededDash( bool update=true );
+private:
+	FormatData * formatData() const;
+	void setFormatData(const FormatData *formatData);
 
-			int check( int errorFlagsToCheck, int minDurationMsecs, int maxDurationMsecs, int minMsecsPerChar, int maxMsecsPerChar, int maxChars, int maxLines, bool update=true );
+	void processAction(Action *action);
 
-		signals:
+private:
+	Subtitle *m_subtitle;
+	SString m_primaryText;
+	SString m_secondaryText;
+	Time m_showTime;
+	Time m_hideTime;
+	int m_errorFlags;
 
-			void primaryTextChanged( const SString& text );
-			void secondaryTextChanged( const SString& text );
-			void showTimeChanged( const Time& showTime );
-			void hideTimeChanged( const Time& hideTime );
-			void errorFlagsChanged( int errorFlags );
+	int m_cachedIndex;
 
-		private:
-
-			FormatData* const formatData() const;
-			void setFormatData( const FormatData* formatData );
-
-			void processAction( Action* action );
-
-		private:
-
-			Subtitle* m_subtitle;
-			SString m_primaryText;
-			SString m_secondaryText;
-			Time m_showTime;
-			Time m_hideTime;
-			int m_errorFlags;
-
-			int m_cachedIndex;
-
-			FormatData* m_formatData;
-	};
+	FormatData *m_formatData;
+};
 }
-
 #endif

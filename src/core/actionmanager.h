@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "action.h"
@@ -30,55 +30,49 @@
 #include <QtCore/QTime>
 #include <QtCore/QLinkedList>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class ActionManager : public QObject
 {
-	class ActionManager : public QObject
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	ActionManager();
+	~ActionManager();
 
-			ActionManager();
-			~ActionManager();
+	bool hasRedo() const;
+	bool hasUndo() const;
 
-			bool hasRedo() const;
-			bool hasUndo() const;
+	int redoCount() const;
+	int undoCount() const;
 
-			int redoCount() const;
-			int undoCount() const;
+	QString redoDescription() const;
+	QString undoDescription() const;
 
-			QString redoDescription() const;
-			QString undoDescription() const;
+	void execAndStore(Action *action);
 
-			void execAndStore( Action* action );
+public slots:
+	void redo();
+	void undo();
+	void popUndo();
+	void clearHistory();
 
-		public slots:
+signals:
+	void actionStored();
+	void actionRemoved();
+	void actionRedone();
+	void actionUndone();
+	void historyCleared();
+	void stateChanged();
 
-			void redo();
-			void undo();
-			void popUndo();
-			void clearHistory();
+private:
+	ActionManager(const ActionManager &undoManager);
+	ActionManager & operator=(const ActionManager &undoManager);
 
-		signals:
+	mutable QLinkedList<Action *> m_undoStack;
+	mutable QLinkedList<Action *> m_redoStack;
 
-			void actionStored();
-			void actionRemoved();
-			void actionRedone();
-			void actionUndone();
-			void historyCleared();
-			void stateChanged();
-
-		private:
-
-			ActionManager( const ActionManager& undoManager );
-			ActionManager& operator=( const ActionManager& undoManager );
-
-			mutable QLinkedList<Action*> m_undoStack;
-			mutable QLinkedList<Action*> m_redoStack;
-
-			int m_compressionThreshold;
-			QTime m_timeBetweenActions;
-	};
+	int m_compressionThreshold;
+	QTime m_timeBetweenActions;
+};
 }
-
 #endif

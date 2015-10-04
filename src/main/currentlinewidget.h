@@ -2,26 +2,26 @@
 #define CURRENTLINEWIDGET_H
 
 /***************************************************************************
-*   Copyright (C) 2007-2009 Sergio Pistone (sergio_pistone@yahoo.com.ar)  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU General Public License     *
-*   along with this program; if not, write to the                         *
-*   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      *
-*   Boston, MA 02110-1301, USA.                                           *
-***************************************************************************/
+ *   Copyright (C) 2007-2009 Sergio Pistone (sergio_pistone@yahoo.com.ar)  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      *
+ *   Boston, MA 02110-1301, USA.                                           *
+ ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../core/subtitle.h"
@@ -36,84 +36,80 @@ class QToolButton;
 class TimeEdit;
 class SimpleRichTextEdit;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class CurrentLineWidget : public QWidget
 {
-	class CurrentLineWidget : public QWidget
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	CurrentLineWidget(QWidget *parent);
+	virtual ~CurrentLineWidget();
 
-			CurrentLineWidget( QWidget* parent );
-			virtual ~CurrentLineWidget();
+	QString focusedText() const;
 
-			QString focusedText() const;
+	void loadConfig();
+	void saveConfig();
 
-			void loadConfig();
-			void saveConfig();
+	void setupActions();
 
-			void setupActions();
+	virtual bool eventFilter(QObject *object, QEvent *event);
 
-		public slots:
+public slots:
+	void setSubtitle(Subtitle *subtitle = 0);
+	void setCurrentLine(SubtitleLine *line);
 
-			void setSubtitle( Subtitle* subtitle=0 );
-			void setCurrentLine( SubtitleLine* line );
+	void setTranslationMode(bool enabled);
 
-			void setTranslationMode( bool enabled );
+	void highlightPrimary(int startIndex, int endIndex);
+	void highlightSecondary(int startIndex, int endIndex);
 
-			void highlightPrimary( int startIndex, int endIndex );
-			void highlightSecondary( int startIndex, int endIndex );
+protected slots:
+	void onPrimaryTextEditSelectionChanged();
+	void onSecondaryTextEditSelectionChanged();
 
-		protected slots:
+	void onPrimaryTextEditChanged();
+	void onSecondaryTextEditChanged();
+	void onShowTimeEditChanged(int showTime);
+	void onHideTimeEditChanged(int hideTime);
+	void onDurationTimeEditChanged(int durationTime);
 
-			void onPrimaryTextEditSelectionChanged();
-			void onSecondaryTextEditSelectionChanged();
+	void onLinePrimaryTextChanged(const SString &primaryText);
+	void onLineSecondaryTextChanged(const SString &secondaryText);
+	void onLineShowTimeChanged(const Time &showTime);
+	void onLineHideTimeChanged(const Time &hideTime);
 
-			void onPrimaryTextEditChanged();
-			void onSecondaryTextEditChanged();
-			void onShowTimeEditChanged( int showTime );
-			void onHideTimeEditChanged( int hideTime );
-			void onDurationTimeEditChanged( int durationTime );
+	void onSpellingOptionChanged(const QString &option, const QString &value);
 
-			void onLinePrimaryTextChanged( const SString& primaryText );
-			void onLineSecondaryTextChanged( const SString& secondaryText );
-			void onLineShowTimeChanged( const Time& showTime );
-			void onLineHideTimeChanged( const Time& hideTime );
+	void markUpdateShortcuts();
+	void updateShortcuts();
 
-			void onSpellingOptionChanged( const QString& option, const QString& value );
+private:
+	QToolButton * createToolButton(const QString &text, const char *icon, QObject *receiver, const char *slot, bool checkable = true);
 
-			void markUpdateShortcuts();
-			void updateShortcuts();
+	QString buildTextDescription(const QString &text);
 
-		private:
+protected:
+	SubtitleLine *m_currentLine;
+	bool m_translationMode;
 
-			QToolButton* createToolButton( const QString& text, const char* icon, QObject* receiver, const char* slot );
+	bool m_updateCurrentLine;
+	bool m_updateControls;
 
-			QString buildTextDescription( const QString& text );
+	TimeEdit *m_showTimeEdit;
+	TimeEdit *m_hideTimeEdit;
+	TimeEdit *m_durationTimeEdit;
 
-		protected:
+	QLabel *m_textLabels[2];
+	SimpleRichTextEdit *m_textEdits[2];
+	QToolButton *m_italicButtons[2];
+	QToolButton *m_boldButtons[2];
+	QToolButton *m_underlineButtons[2];
+	QToolButton *m_strikeThroughButtons[2];
+	QToolButton *m_textColorButtons[2];
 
-			SubtitleLine* m_currentLine;
-			bool m_translationMode;
+	QGridLayout *m_mainLayout;
 
-			bool m_updateCurrentLine;
-			bool m_updateControls;
-
-			TimeEdit* m_showTimeEdit;
-			TimeEdit* m_hideTimeEdit;
-			TimeEdit* m_durationTimeEdit;
-
-			QLabel* m_textLabels[2];
-			SimpleRichTextEdit* m_textEdits[2];
-			QToolButton* m_italicButtons[2];
-			QToolButton* m_boldButtons[2];
-			QToolButton* m_underlineButtons[2];
-			QToolButton* m_strikeThroughButtons[2];
-
-			QGridLayout* m_mainLayout;
-
-			QTimer* m_updateShorcutsTimer;
-	};
+	QTimer *m_updateShorcutsTimer;
+};
 }
-
 #endif

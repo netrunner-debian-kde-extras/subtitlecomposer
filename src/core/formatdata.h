@@ -21,68 +21,60 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include <QtCore/QString>
 #include <QtCore/QMap>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class FormatData
 {
-	class FormatData
+	friend class Format;
+
+public:
+	FormatData(const FormatData &formatData) :
+		m_formatName(formatData.m_formatName),
+		m_data(formatData.m_data) {}
+
+	FormatData & operator=(const FormatData &formatData)
 	{
-		friend class Format;
+		if(this == &formatData)
+			return *this;
 
-		public:
+		m_formatName = formatData.m_formatName;
+		m_data = formatData.m_data;
 
-			FormatData( const FormatData& formatData ):
-				m_formatName( formatData.m_formatName ),
-				m_data( formatData.m_data )
-			{
-			}
+		return *this;
+	}
 
-			FormatData& operator=( const FormatData& formatData )
-			{
-				if ( this == &formatData )
-					return *this;
+	inline const QString & formatName()
+	{
+		return m_formatName;
+	}
 
-				m_formatName = formatData.m_formatName;
-				m_data = formatData.m_data;
+	inline const QString & value(const QString &key)
+	{
+		static const QString empty;
+		return m_data.contains(key) ? m_data[key] : empty;
+	}
 
-				return *this;
-			}
+	inline void setValue(const QString &key, const QString &value)
+	{
+		m_data[key] = value;
+	}
 
-			inline const QString& formatName()
-			{
-				return m_formatName;
-			}
+	inline void clear()
+	{
+		m_data.clear();
+	}
 
-			inline const QString& value( const QString& key )
-			{
-				static const QString empty;
-				return m_data.contains( key ) ? m_data[key] : empty;
-			}
+private:
+	FormatData(const QString &formatName) : m_formatName(formatName) {}
 
-			inline void setValue( const QString& key, const QString& value )
-			{
-				m_data[key] = value;
-			}
-
-			inline void clear()
-			{
-				m_data.clear();
-			}
-
-		private:
-
-			FormatData( const QString& formatName ):
-				m_formatName( formatName )
-			{
-			}
-
-			QString m_formatName;
-			QMap<QString,QString> m_data;
-	};
+	QString m_formatName;
+	QMap<QString, QString> m_data;
+};
 }
 
 #endif

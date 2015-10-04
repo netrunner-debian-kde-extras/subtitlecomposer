@@ -23,7 +23,9 @@
 #include "playerwidget.h"
 #include "lineswidget.h"
 #include "currentlinewidget.h"
-#include "../player/player.h"
+#include "statusbar.h"
+#include "../services/player.h"
+#include "../services/decoder.h"
 
 #include <QtGui/QGridLayout>
 #include <QtGui/QSplitter>
@@ -32,73 +34,82 @@
 #include <KToolBar>
 #include <KStatusBar>
 #include <KActionCollection>
+#include <KConfigGroup>
 
 using namespace SubtitleComposer;
 
-MainWindow::MainWindow():
-	KXmlGuiWindow( 0 )
+MainWindow::MainWindow() :
+	KXmlGuiWindow(0)
 {
-	QWidget* mainWidget = new QWidget( this );
+	QWidget *mainWidget = new QWidget(this);
 
-	QSplitter* splitter = new QSplitter( mainWidget );
+	m_splitter = new QSplitter(mainWidget);
 
-// 	m_audiolevelsWidget = new AudioLevelsWidget( splitter );
-// 	m_audiolevelsWidget->hide();
+	m_playerWidget = new PlayerWidget(m_splitter);
+	m_playerWidget->setContentsMargins(0, 0, 0, 0);
 
-	m_playerWidget = new PlayerWidget( splitter );
-	m_playerWidget->setContentsMargins( 0, 0, 0, 0 );
+	m_linesWidget = new LinesWidget(m_splitter);
+	m_linesWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	m_linesWidget = new LinesWidget( splitter );
-	m_linesWidget->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+	m_splitter->setOrientation(Qt::Vertical);
+	m_splitter->setLineWidth(0);
+	m_splitter->setCollapsible(1, false);
+	m_splitter->setSizes(QList<int>() << 100 << 200);
 
-	splitter->setOrientation( Qt::Vertical );
-	splitter->setLineWidth( 0 );
-	splitter->setCollapsible( 1, false );
-	splitter->setSizes( QList<int>() << 100 << 200 );
+	m_curLineWidget = new CurrentLineWidget(mainWidget);
+	m_curLineWidget->setMaximumHeight(m_curLineWidget->minimumSizeHint().height());
 
-	m_curLineWidget = new CurrentLineWidget( mainWidget );
-	m_curLineWidget->setMaximumHeight( m_curLineWidget->minimumSizeHint().height() );
+	m_statusBar = new StatusBar2(this);
 
-	QLayout* mainWidgetLayout = new QBoxLayout( QBoxLayout::TopToBottom, mainWidget );
-	mainWidgetLayout->setContentsMargins( 5, 1, 5, 2 );
-	mainWidgetLayout->setSpacing( 5 );
-	mainWidgetLayout->addWidget( splitter );
-	mainWidgetLayout->addWidget( m_curLineWidget );
+	QLayout *mainWidgetLayout = new QBoxLayout(QBoxLayout::TopToBottom, mainWidget);
+	mainWidgetLayout->setContentsMargins(5, 1, 5, 2);
+	mainWidgetLayout->setSpacing(5);
+	mainWidgetLayout->addWidget(m_splitter);
+	mainWidgetLayout->addWidget(m_curLineWidget);
 
-	setCentralWidget( mainWidget ); // tell the KMainWindow that this is indeed the main widget
+	setStatusBar(m_statusBar);
+	setCentralWidget(mainWidget);
 
-	statusBar()->show(); // a status bar
-	toolBar()->show(); // and a tool bar
+	statusBar()->show();
+	toolBar()->show();
 	menuBar()->show();
 }
-
 
 MainWindow::~MainWindow()
 {
 	app()->saveConfig();
 
-	Player* player = Player::instance();
+	// We must disconnect the player and the decoder when closing down, otherwise signal
+	// handlers could be called with the some object destroyed, crashing the application
+	disconnect(Player::instance(), 0, 0, 0);
+	disconnect(Decoder::instance(), 0, 0, 0);
 
-	// We must disconnect the player when closing down, otherwise signal handlers
-	// could be called with the some object destroyed, crashing the application
-	disconnect( player, 0, 0, 0 );
-
-	player->setApplicationClosingDown();
+	Player::instance()->setApplicationClosingDown();
+	Decoder::instance()->setApplicationClosingDown();
 }
 
-void MainWindow::loadConfig()
+void
+MainWindow::loadConfig()
 {
+	KConfigGroup group(KGlobal::config()->group("MainWindow Settings"));
+
+	m_splitter->setSizes(group.readEntry("Splitter Sizes", m_splitter->sizes()));
 }
 
-void MainWindow::saveConfig()
+void
+MainWindow::saveConfig()
 {
+	KConfigGroup group(KGlobal::config()->group("MainWindow Settings"));
+
+	group.writeEntry("Splitter Sizes", m_splitter->sizes());
 }
 
-void MainWindow::setSubtitle( Subtitle* /*subtitle*/ )
-{
-}
+void
+MainWindow::setSubtitle(Subtitle * /*subtitle */)
+{}
 
-bool MainWindow::queryClose()
+bool
+MainWindow::queryClose()
 {
 	return app()->closeSubtitle();
 }

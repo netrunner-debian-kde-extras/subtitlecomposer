@@ -21,67 +21,60 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../inputformat.h"
 
 #include <QtCore/QRegExp>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class SubViewer1InputFormat : public InputFormat
 {
-	class SubViewer1InputFormat : public InputFormat
+	friend class FormatManager;
+
+public:
+	virtual ~SubViewer1InputFormat() {}
+
+protected:
+	virtual bool parseSubtitles(Subtitle &subtitle, const QString &data) const
 	{
-		friend class FormatManager;
+		if(m_regExp.indexIn(data, 0) == -1)
+			return false; // couldn't find first line
 
-		public:
+		unsigned readLines = 0;
 
-			virtual ~SubViewer1InputFormat() {}
+		int offset = m_regExp.pos();
+		do {
+			offset += m_regExp.matchedLength();
 
-			virtual bool parseSubtitles( Subtitle& subtitle, const QString& data ) const
-			{
-				if ( m_regExp.indexIn( data, 0 ) == -1 )
-					return false; // couldn't find first line
+			Time showTime(m_regExp.cap(1).toInt(), m_regExp.cap(2).toInt(), m_regExp.cap(3).toInt(), 0);
 
-				unsigned readLines = 0;
+			QString text(m_regExp.cap(4).replace("|", "\n").trimmed());
 
-				int offset = m_regExp.pos();
-				do
-				{
-					offset += m_regExp.matchedLength();
+			// search hideTime
+			if(m_regExp.indexIn(data, offset) == -1)
+				break;
 
-					Time showTime( m_regExp.cap( 1 ).toInt(), m_regExp.cap( 2 ).toInt(), m_regExp.cap( 3 ).toInt(), 0 );
+			Time hideTime(m_regExp.cap(1).toInt(), m_regExp.cap(2).toInt(), m_regExp.cap(3).toInt(), 0);
 
-					QString text( m_regExp.cap( 4 ).replace( "|", "\n" ).trimmed() );
+			subtitle.insertLine(new SubtitleLine(text, showTime, hideTime));
 
-					// search hideTime
-					if ( m_regExp.indexIn( data, offset ) == -1 )
-						break;
+			offset += m_regExp.matchedLength();
 
-					Time hideTime( m_regExp.cap( 1 ).toInt(), m_regExp.cap( 2 ).toInt(), m_regExp.cap( 3 ).toInt(), 0 );
+			readLines++;
+		} while(m_regExp.indexIn(data, offset) != -1);          // search next line's showTime
 
-					subtitle.insertLine( new SubtitleLine( text, showTime, hideTime ) );
+		return readLines > 0;
+	}
 
-					offset += m_regExp.matchedLength();
+	SubViewer1InputFormat() :
+		InputFormat("SubViewer 1.0", QStringList("sub")),
+		m_regExp("\\[([0-2][0-9]):([0-5][0-9]):([0-5][0-9])\\]\n([^\n]*)\n")
+	{}
 
-					readLines++;
-				}
-				while ( m_regExp.indexIn( data, offset ) != -1 ); // search next line's showTime
-
-				return readLines > 0;
-			}
-
-		protected:
-
-			SubViewer1InputFormat():
-				InputFormat( "SubViewer 1.0", QStringList( "sub" ) ),
-				m_regExp( "\\[([0-2][0-9]):([0-5][0-9]):([0-5][0-9])\\]\n([^\n]*)\n" )
-			{
-			}
-
-			mutable QRegExp m_regExp;
-	};
+	mutable QRegExp m_regExp;
+};
 }
 
 #endif
-

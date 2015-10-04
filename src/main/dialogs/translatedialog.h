@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actionwithtargetdialog.h"
@@ -29,22 +29,18 @@
 
 class QComboBox;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class TranslateDialog : public ActionWithTargetDialog
 {
-	class TranslateDialog : public ActionWithTargetDialog
-	{
-		public:
+public:
+	TranslateDialog(QWidget *parent = 0);
 
-			TranslateDialog( QWidget* parent=0 );
+	Language::Value inputLanguage() const;
+	Language::Value outputLanguage() const;
 
-			Language::Value inputLanguage() const;
-			Language::Value outputLanguage() const;
-
-		private:
-
-			QComboBox* m_inputLanguageComboBox;
-			QComboBox* m_outputLanguageComboBox;
-	};
+private:
+	QComboBox *m_inputLanguageComboBox;
+	QComboBox *m_outputLanguageComboBox;
+};
 }
-
 #endif

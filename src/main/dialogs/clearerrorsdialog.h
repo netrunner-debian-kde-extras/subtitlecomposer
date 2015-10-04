@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actionwitherrortargetsdialog.h"
@@ -30,20 +30,16 @@
 class QCheckBox;
 class KPushButton;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class ClearErrorsDialog : public ActionWithErrorTargetsDialog
 {
-	class ClearErrorsDialog : public ActionWithErrorTargetsDialog
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	ClearErrorsDialog(QWidget *parent = 0);
 
-			ClearErrorsDialog( QWidget* parent=0 );
-
-		protected:
-
-			virtual void setTranslationMode( bool value );
-	};
+protected:
+	virtual void setTranslationMode(bool value);
+};
 }
-
 #endif

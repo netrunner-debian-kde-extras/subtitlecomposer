@@ -1,3 +1,27 @@
+Version 0.5.7
+- ADD: GStreamer 1.0 support
+- ADD: added Debian build
+- MOD: updated Bulgarian and Croatian translations
+- FIX: Phonon backend supports audio channel change
+- FIX: Command line params were expected to be URL encoded
+- FIX: UTF subtitles are saved with BOM
+- FIX: updated/fixed translation catalogs and list of translators
+- FIX: some files were wrongly identified as tmplayer subtitles
+
+Version 0.5.6:
+- SubStation Alpha format fixes and color support
+- source cleanup
+
+Version 0.5.5:
+- text color support
+- SubRip text color support
+- reworked MicroDVD open/save
+
+Version 0.5.4:
+- mplayer2 support
+- mplayer VDPAU decoding support
+- minor cmake build fixes
+
 Version 0.5.3:
 - added Czech, Brazilian Portuguese, Bulgarian, French and German translations contributed by Petr
   Gadula, Marcio P. Moraes, Petar Toushkov, Thomas Gastine and Panagiotis Papadopoulos respectively

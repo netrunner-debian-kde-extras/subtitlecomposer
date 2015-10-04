@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include <KDialog>
@@ -31,31 +31,25 @@ class QGridLayout;
 class QVBoxLayout;
 class QGroupBox;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class ActionDialog : public KDialog
 {
-	class ActionDialog : public KDialog
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	explicit ActionDialog(const QString &title, QWidget *parent = 0);
 
-			explicit ActionDialog( const QString& title, QWidget* parent=0 );
+public slots:
+	virtual int exec();
+	virtual void show();
 
-		public slots:
+protected:
+	QGroupBox * createGroupBox(const QString &title = QString(), bool addToLayout = true);
+	QGridLayout * createLayout(QGroupBox *groupBox);
 
-			virtual int exec();
-			virtual void show();
-
-		protected:
-
-			QGroupBox* createGroupBox( const QString& title=QString(), bool addToLayout=true );
-			QGridLayout* createLayout( QGroupBox* groupBox );
-
-		protected:
-
-			QWidget* m_mainWidget;
-			QVBoxLayout* m_mainLayout;
-	};
+protected:
+	QWidget *m_mainWidget;
+	QVBoxLayout *m_mainLayout;
+};
 }
-
 #endif

@@ -30,54 +30,45 @@ class AttachableWidget : public QWidget
 {
 	Q_OBJECT
 
-	public:
+public:
+	typedef enum { Top, Bottom } Place;
 
-		typedef enum { Top, Bottom } Place;
+	explicit AttachableWidget(Place place = Bottom, unsigned animStepDuration = 4);
+	virtual ~AttachableWidget();
 
-		explicit AttachableWidget( Place place=Bottom, unsigned animStepDuration=4, QWidget* parent=0 );
-		virtual ~AttachableWidget();
+	bool isAttached() const;
 
-		bool isAnimated() const;
-		unsigned animStepDuration() const;
+	bool isAnimated() const;
+	int animStepDuration() const;
 
-		bool autoHide() const;
+	virtual bool eventFilter(QObject *object, QEvent *event);
 
-		int greyZoneSize() const;
+public slots:
+	void attach(QWidget *target);
+	void dettach();
 
-		virtual bool eventFilter( QObject* object, QEvent* event );
+	void setAnimStepDuration(int stepDuration);
 
-	public slots:
+	void toggleVisible(bool visible);
 
-		void attach( QWidget* target );
-		void dettach();
+protected:
+	virtual void timerEvent(QTimerEvent *event);
 
-		void setAnimStepDuration( int stepDuration );
-		void setAutoHide( bool autoHide );
-		void setGreyZoneSize( int size );
+private:
+	void toggleVisible(bool visible, bool force);
 
-	protected:
+private:
+	QWidget *m_targetWidget;
+	Place m_place;
+	int m_animStepDuration;
 
-		virtual void timerEvent( QTimerEvent* event );
+	typedef enum { Upward, Downward } Direction;
 
-	private:
-
-		void toggleVisible( bool visible, bool force=false );
-
-	private:
-
-		QWidget* m_targetWidget;
-		Place m_place;
-		unsigned m_animStepDuration;
-		bool m_autoHide;
-		int m_greyZoneSize;
-
-		typedef enum { Upward, Downward } Direction;
-
-		int m_animTID;
-		bool m_animHiding;
-		int m_animFinalY;
-		int m_animCurrentY;
-		Direction m_animDirection;
+	int m_animTID;
+	bool m_animHiding;
+	int m_animFinalY;
+	int m_animCurrentY;
+	Direction m_animDirection;
 };
 
 #endif

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include <QtCore/QList>
@@ -34,25 +34,21 @@ class LayeredWidget : public QWidget
 {
 	Q_OBJECT
 
-	public:
+public:
+	typedef enum { HandleResize, IgnoreResize } Mode;
 
-		typedef enum { HandleResize, IgnoreResize } Mode;
+	explicit LayeredWidget(QWidget *parent = 0, Qt::WFlags f = 0);
 
-		explicit LayeredWidget( QWidget* parent=0, Qt::WFlags f=0 );
+	void setWidgetMode(QWidget *widget, Mode mode);
 
-		void setWidgetMode( QWidget* widget, Mode mode );
+public slots:
+	virtual void setMouseTracking(bool enable);
 
-	public slots:
+protected:
+	virtual void resizeEvent(QResizeEvent *e);
 
-		virtual void setMouseTracking( bool enable );
-
-	protected:
-
-		virtual void resizeEvent( QResizeEvent* e );
-
-	private:
-
-		QList<QObject*> m_ignoredWidgets;
+private:
+	QList<QObject *> m_ignoredWidgets;
 };
 
 #endif

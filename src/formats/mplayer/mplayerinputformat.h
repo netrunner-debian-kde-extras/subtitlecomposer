@@ -21,54 +21,47 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../inputformat.h"
 
 #include <QtCore/QRegExp>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class MPlayerInputFormat : public InputFormat
 {
-	class MPlayerInputFormat : public InputFormat
+	friend class FormatManager;
+
+public:
+	virtual ~MPlayerInputFormat() {}
+
+protected:
+	virtual bool parseSubtitles(Subtitle &subtitle, const QString &data) const
 	{
-		friend class FormatManager;
+		double framesPerSecond = subtitle.framesPerSecond();
 
-		public:
+		unsigned readLines = 0;
 
-			virtual ~MPlayerInputFormat() {}
+		for(int offset = 0; m_lineRegExp.indexIn(data, offset) != -1; offset += m_lineRegExp.matchedLength()) {
+			Time showTime((long)((m_lineRegExp.cap(1).toLong() / framesPerSecond) * 1000));
+			Time hideTime((long)((m_lineRegExp.cap(2).toLong() / framesPerSecond) * 1000));
+			QString text(m_lineRegExp.cap(3).replace("|", "\n"));
 
-			virtual bool parseSubtitles( Subtitle& subtitle, const QString& data ) const
-			{
-				double framesPerSecond = subtitle.framesPerSecond();
+			subtitle.insertLine(new SubtitleLine(text, showTime, hideTime));
 
-				unsigned readLines = 0;
+			readLines++;
+		}
+		return readLines > 0;
+	}
 
-				for ( int offset = 0; m_lineRegExp.indexIn( data, offset ) != -1; offset += m_lineRegExp.matchedLength() )
-				{
-					Time showTime( (long)((m_lineRegExp.cap( 1 ).toLong() / framesPerSecond)*1000) );
-					Time hideTime( (long)((m_lineRegExp.cap( 2 ).toLong() / framesPerSecond)*1000) );
-					QString text( m_lineRegExp.cap( 3 ).replace( "|", "\n" ) );
+	MPlayerInputFormat() :
+		InputFormat("MPlayer", QStringList("mpl")),
+		m_lineRegExp("(^|\n)(\\d+),(\\d+),0,([^\n]+)[^\n]")
+	{}
 
-					subtitle.insertLine( new SubtitleLine( text, showTime, hideTime ) );
-
-					readLines++;
-				}
-
-				return readLines > 0;
-			}
-
-		protected:
-
-			MPlayerInputFormat():
-				InputFormat( "MPlayer", QStringList( "mpl" ) ),
-				m_lineRegExp( "(^|\n)(\\d+),(\\d+),0,([^\n]+)[^\n]" )
-			{
-			}
-
-			mutable QRegExp m_lineRegExp;
-	};
+	mutable QRegExp m_lineRegExp;
+};
 }
 
 #endif
-

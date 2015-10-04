@@ -21,52 +21,26 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "format.h"
-#include "../common/filesavehelper.h"
-
-#include <QtCore/QFile>
-#include <QtCore/QTextCodec>
-#include <QtCore/QTextStream>
-
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class OutputFormat : public Format
 {
-	class OutputFormat : public Format
+public:
+	virtual ~OutputFormat() {}
+
+	QString writeSubtitle(const Subtitle &subtitle, bool primary) const
 	{
-		public:
+		return dumpSubtitles(subtitle, primary);
+	}
 
-			virtual ~OutputFormat() {}
+protected:
+	virtual QString dumpSubtitles(const Subtitle &subtitle, bool primary) const = 0;
 
-			bool writeSubtitle( const Subtitle& subtitle, NewLine newLine, bool primary, const KUrl& url, QTextCodec* codec, bool overwrite ) const
-			{
-				FileSaveHelper fileSaveHelper( url, overwrite );
-
-				if ( ! fileSaveHelper.open() )
-					return false;
-
-				QString data = dumpSubtitles( subtitle, primary );
-				if ( newLine == Windows )
-					data.replace( "\n", "\r\n" );
-				else if ( newLine == Macintosh )
-					data.replace( "\n", "\r" );
-
-				QTextStream stream( fileSaveHelper.file() );
-				stream.setCodec( codec );
-				stream << data;
-
-				return fileSaveHelper.close();
-			}
-
-			virtual QString dumpSubtitles( const Subtitle& subtitle, bool secondary ) const = 0;
-
-		protected:
-
-			OutputFormat( const QString& name, const QStringList& extensions ):
-				Format( name, extensions ) {}
-	};
-
+	OutputFormat(const QString &name, const QStringList &extensions) : Format(name, extensions) {}
+};
 }
 
 #endif

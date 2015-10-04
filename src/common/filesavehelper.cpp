@@ -24,58 +24,56 @@
 #include <KTemporaryFile>
 #include <KIO/NetAccess>
 
-FileSaveHelper::FileSaveHelper( const KUrl& url, bool overwrite ):
-	m_url( url ),
-	m_overwrite( overwrite ),
-	m_file( 0 )
-{
-}
+FileSaveHelper::FileSaveHelper(const KUrl &url, bool overwrite) :
+	m_url(url),
+	m_overwrite(overwrite),
+	m_file(0)
+{}
 
 FileSaveHelper::~FileSaveHelper()
 {
-	if ( m_file )
+	if(m_file)
 		close();
 }
 
-const KUrl& FileSaveHelper::url()
+const KUrl &
+FileSaveHelper::url()
 {
 	return m_url;
 }
 
-bool FileSaveHelper::overwrite()
+bool
+FileSaveHelper::overwrite()
 {
 	return m_overwrite;
 }
 
-QFile* FileSaveHelper::file()
+QFile *
+FileSaveHelper::file()
 {
 	return m_file;
 }
 
-bool FileSaveHelper::open()
+bool
+FileSaveHelper::open()
 {
-	if ( m_file )
+	if(m_file)
 		return false;
 
-	if ( ! m_overwrite && KIO::NetAccess::exists( m_url, KIO::NetAccess::DestinationSide, 0 ) )
+	if(!m_overwrite && KIO::NetAccess::exists(m_url, KIO::NetAccess::DestinationSide, 0))
 		return false;
 
-	if ( m_url.isLocalFile() )
-	{
-		m_file = new KSaveFile( m_url.path() );
-		if ( ! m_file->open( QIODevice::WriteOnly|QIODevice::Truncate ) )
-		{
+	if(m_url.isLocalFile()) {
+		m_file = new KSaveFile(m_url.path());
+		if(!m_file->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 			kDebug() << "couldn't open output file" << m_file->fileName();
 			delete m_file;
 			m_file = 0;
 			return false;
 		}
-	}
-	else
-	{
+	} else {
 		m_file = new KTemporaryFile();
-		if ( ! ((KTemporaryFile*)m_file)->open() )
-		{
+		if(!((KTemporaryFile *)m_file)->open()) {
 			kDebug() << "couldn't open output file" << m_file->fileName();
 			delete m_file;
 			m_file = 0;
@@ -85,34 +83,30 @@ bool FileSaveHelper::open()
 	return true;
 }
 
-bool FileSaveHelper::close()
+bool
+FileSaveHelper::close()
 {
-	if ( ! m_file )
+	if(!m_file)
 		return false;
 
-	if ( m_url.isLocalFile() )
-	{
-		delete m_file; // the destructor calls finalize() which in turn calls close()
+	if(m_url.isLocalFile()) {
+		delete m_file;                  // the destructor calls finalize() which in turn calls close()
 		m_file = 0;
 		return true;
-	}
-	else
-	{
-		m_file->close(); // close the file to ensure everything has been written to it
+	} else {
+		m_file->close();                // close the file to ensure everything has been written to it
 
-		bool success =
-			m_overwrite ?
-			KIO::NetAccess::upload( m_file->fileName(), m_url, 0 ) :
-			KIO::NetAccess::file_copy( KUrl( m_file->fileName() ), m_url, 0 );
+		bool success = m_overwrite ? KIO::NetAccess::upload(m_file->fileName(), m_url, 0) : KIO::NetAccess::file_copy(KUrl(m_file->fileName()), m_url, 0);
 
-		delete m_file; // the destructor removes the temporary file
+		delete m_file;                  // the destructor removes the temporary file
 		m_file = 0;
 
 		return success;
 	}
 }
 
-bool FileSaveHelper::exists( const KUrl& url )
+bool
+FileSaveHelper::exists(const KUrl &url)
 {
-	return KIO::NetAccess::exists( url, KIO::NetAccess::DestinationSide, 0 );
+	return KIO::NetAccess::exists(url, KIO::NetAccess::DestinationSide, 0);
 }

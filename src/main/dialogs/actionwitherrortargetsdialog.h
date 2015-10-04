@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actionwithtargetdialog.h"
@@ -31,36 +31,30 @@ class QGroupBox;
 class QCheckBox;
 class QGridLayout;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class ActionWithErrorTargetsDialog : public ActionWithTargetDialog
 {
-	class ActionWithErrorTargetsDialog : public ActionWithTargetDialog
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	~ActionWithErrorTargetsDialog();
 
-			~ActionWithErrorTargetsDialog();
+	int selectedErrorFlags() const;
 
-			int selectedErrorFlags() const;
+protected:
+	explicit ActionWithErrorTargetsDialog(const QString &title, QWidget *parent = 0);
 
-		protected:
+	QGroupBox * createErrorsGroupBox(const QString &title);
+	void createErrorsButtons(bool showUserMarks, bool showMissingTranslation);
 
-			explicit ActionWithErrorTargetsDialog( const QString& title, QWidget* parent=0 );
+private slots:
+	void selectAllErrorFlags();
+	void deselectAllErrorFlags();
 
-			QGroupBox* createErrorsGroupBox( const QString& title );
-			void createErrorsButtons( bool showUserMarks, bool showMissingTranslation );
-
-		private slots:
-
-			void selectAllErrorFlags();
-			void deselectAllErrorFlags();
-
-		private:
-
-			QGroupBox* m_errorsGroupBox;
-			QCheckBox** m_errorsCheckBox;
-			QGridLayout* m_errorsLayout;
-	};
+private:
+	QGroupBox *m_errorsGroupBox;
+	QCheckBox **m_errorsCheckBox;
+	QGridLayout *m_errorsLayout;
+};
 }
-
 #endif

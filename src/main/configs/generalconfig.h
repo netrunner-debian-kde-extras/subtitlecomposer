@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../../config/appconfiggroup.h"
@@ -30,58 +30,70 @@
 
 #include <KGlobal>
 #include <KLocale>
+#include <KCharsets>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class GeneralConfig : public AppConfigGroup
 {
-	class GeneralConfig : public AppConfigGroup
+	friend class Application;
+	friend class GeneralConfigWidget;
+
+public:
+
+	virtual AppConfigGroup * clone() const { return new GeneralConfig(*this); }
+	QString defaultSubtitlesEncoding() const { return option(keyDefaultSubtitlesEncoding()); }
+	QTextCodec * defaultSubtitlesCodec() const
 	{
-		friend class Application;
-		friend class GeneralConfigWidget;
+		bool encodingFound;
+		QTextCodec *codec = KGlobal::charsets()->codecForName(defaultSubtitlesEncoding(), encodingFound);
+		if(!encodingFound)
+			codec = KGlobal::locale()->codecForEncoding();
+		return codec;
+	}
 
-		public:
+	void setDefaultSubtitlesEncoding(const QString &encoding) { setOption(keyDefaultSubtitlesEncoding(), encoding); }
 
-			virtual AppConfigGroup* clone() const { return new GeneralConfig( *this ); }
+	int seekOffsetOnDoubleClick() const { return optionAsInt(keySeekOffsetOnDoubleClick()); } // in milliseconds
 
-			QString defaultSubtitlesEncoding() const { return option( keyDefaultSubtitlesEncoding() ); }
-			void setDefaultSubtitlesEncoding( const QString& encoding ) { setOption( keyDefaultSubtitlesEncoding(), encoding ); }
+	void setSeekOffsetOnDoubleClick(int mseconds) { setOption(keySeekOffsetOnDoubleClick(), mseconds); }
+	bool automaticVideoLoad() const { return optionAsBool(keyAutomaticVideoLoad()); }
+	void setAutomaticVideoLoad(bool automaticLoad) { setOption(keyAutomaticVideoLoad(), automaticLoad); }
 
-			int seekOffsetOnDoubleClick() const { return optionAsInt( keySeekOffsetOnDoubleClick() ); } /// in milliseconds
-			void setSeekOffsetOnDoubleClick( int mseconds ) { setOption( keySeekOffsetOnDoubleClick(), mseconds ); }
+	int linesQuickShiftAmount() const { return optionAsInt(keyLinesQuickShiftAmount()); }  // in milliseconds
+	void setLinesQuickShiftAmount(int mseconds) { setOption(keyLinesQuickShiftAmount(), mseconds); }
 
-			bool automaticVideoLoad() const { return optionAsBool( keyAutomaticVideoLoad() ); }
-			void setAutomaticVideoLoad( bool automaticLoad ) { setOption( keyAutomaticVideoLoad(), automaticLoad ); }
+	int grabbedPositionCompensation() const { return optionAsInt(keyGrabbedPositionCompensation()); } // in milliseconds
+	void setGrabbedPositionCompensation(int mseconds) { setOption(keyGrabbedPositionCompensation(), mseconds); }
 
-			int linesQuickShiftAmount() const { return optionAsInt( keyLinesQuickShiftAmount() ); } /// in milliseconds
-			void setLinesQuickShiftAmount( int mseconds ) { setOption( keyLinesQuickShiftAmount(), mseconds ); }
+	static const QString & keyDefaultSubtitlesEncoding() { static const QString key("DefaultSubtitlesEncoding"); return key; }
 
-			int grabbedPositionCompensation() const { return optionAsInt( keyGrabbedPositionCompensation() ); } /// in milliseconds
-			void setGrabbedPositionCompensation( int mseconds ) { setOption( keyGrabbedPositionCompensation(), mseconds ); }
+	static const QString & keySeekOffsetOnDoubleClick() { static const QString key("SeekOffsetOnDoubleClick"); return key; }
 
+	static const QString & keyAutomaticVideoLoad() { static const QString key("AutomaticVideoLoad"); return key; }
 
-			static const QString& keyDefaultSubtitlesEncoding() { static const QString key( "DefaultSubtitlesEncoding" ); return key; }
-			static const QString& keySeekOffsetOnDoubleClick() { static const QString key( "SeekOffsetOnDoubleClick" ); return key; }
-			static const QString& keyAutomaticVideoLoad() { static const QString key( "AutomaticVideoLoad" ); return key; }
-			static const QString& keyLinesQuickShiftAmount() { static const QString key( "LinesQuickShiftAmount" ); return key; }
-			static const QString& keyGrabbedPositionCompensation() { static const QString key( "GrabbedPositionCompensation" ); return key; }
+	static const QString & keyLinesQuickShiftAmount() { static const QString key("LinesQuickShiftAmount"); return key; }
 
-		private:
+	static const QString & keyGrabbedPositionCompensation() { static const QString key("GrabbedPositionCompensation"); return key; }
 
-			GeneralConfig():AppConfigGroup( "General", defaults() ) {}
-			GeneralConfig( const GeneralConfig& config ):AppConfigGroup( config ) {}
+private:
 
-			static QMap<QString,QString> defaults()
-			{
-				QMap<QString,QString> defaults;
+	GeneralConfig() : AppConfigGroup("General", defaults()) {}
 
-				defaults[keyDefaultSubtitlesEncoding()] = KGlobal::locale()->codecForEncoding()->name();
-				defaults[keySeekOffsetOnDoubleClick()] = "1500"; // in milliseconds
-				defaults[keyAutomaticVideoLoad()] = "true";
-				defaults[keyLinesQuickShiftAmount()] = "100"; // in milliseconds
-				defaults[keyGrabbedPositionCompensation()] = "250"; // in milliseconds
+	GeneralConfig(const GeneralConfig &config) : AppConfigGroup(config) {}
 
-				return defaults;
-			}
-	};
+	static QMap<QString, QString> defaults()
+	{
+		QMap<QString, QString> defaults;
+
+		defaults[keyDefaultSubtitlesEncoding()] = KGlobal::locale()->codecForEncoding()->name();
+		defaults[keySeekOffsetOnDoubleClick()] = "1500";        // in milliseconds
+		defaults[keyAutomaticVideoLoad()] = "true";
+		defaults[keyLinesQuickShiftAmount()] = "100";   // in milliseconds
+		defaults[keyGrabbedPositionCompensation()] = "250";     // in milliseconds
+
+		return defaults;
+	}
+};
 }
 
 #endif

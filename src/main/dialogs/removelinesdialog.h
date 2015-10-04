@@ -21,19 +21,16 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actionwithtargetdialog.h"
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class RemoveLinesDialog : public ActionWithTextsTargetDialog
 {
-	class RemoveLinesDialog : public ActionWithTextsTargetDialog
-	{
-		public:
-
-			RemoveLinesDialog( QWidget* parent=0 );
-	};
+public:
+	RemoveLinesDialog(QWidget *parent = 0);
+};
 }
-
 #endif

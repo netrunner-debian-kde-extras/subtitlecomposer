@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include <QtGui/QTimeEdit>
@@ -32,39 +32,32 @@ class TimeEdit : public QTimeEdit
 {
 	Q_OBJECT
 
-	public:
+public:
+	TimeEdit(QWidget *parent = 0);
 
-		TimeEdit( QWidget* parent=0 );
+	int msecsStep() const;
 
-		int msecsStep() const;
+	int value() const;
 
-		int value() const;
+	virtual void stepBy(int steps);
 
-		virtual void stepBy( int steps );
+public slots:
+	void setMSecsStep(int msecs);
+	void setValue(int value);
 
-	public slots:
+signals:
+	void valueChanged(int value);
+	void valueEntered(int value);
 
-		void setMSecsStep( int msecs );
+protected slots:
+	void onTimeChanged(const QTime &time);
 
-		void setValue( int value );
+protected:
+	virtual StepEnabled stepEnabled() const;
+	virtual void keyPressEvent(QKeyEvent *event);
 
-	signals:
-
-		void valueChanged( int value );
-		void valueEntered( int value );
-
-	protected slots:
-
-		void onTimeChanged( const QTime& time );
-
-	protected:
-
-		virtual StepEnabled stepEnabled() const;
-		virtual void keyPressEvent( QKeyEvent* event );
-
-	private:
-
-		int m_secsStep;
+private:
+	int m_secsStep;
 };
 
 #endif

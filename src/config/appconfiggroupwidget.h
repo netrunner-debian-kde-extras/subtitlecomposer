@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "appconfiggroup.h"
@@ -31,45 +31,37 @@
 class QGroupBox;
 class QGridLayout;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class AppConfigGroupWidget : public QWidget
 {
-	class AppConfigGroupWidget : public QWidget
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+/// ownership of the config object is transferred to this object
+	explicit AppConfigGroupWidget(AppConfigGroup *configGroup, QWidget *parent = 0);
+	virtual ~AppConfigGroupWidget();
 
-			/// ownership of the config object is transferred to this object
-			explicit AppConfigGroupWidget( AppConfigGroup* configGroup, QWidget* parent=0 );
-			virtual ~AppConfigGroupWidget();
+	const AppConfigGroup * config();
 
-			const AppConfigGroup* const config();
+signals:
+	void settingsChanged();
 
-		signals:
+public slots:
+/// If possible (i.e., configs are compatible), copies the config object into
+/// the widget config. Ownership of config object it's not transferred.
+	void setConfig(const AppConfigGroup *const config);
 
-			void settingsChanged();
+	void setControlsFromDefaults();
+	virtual void setControlsFromConfig() = 0;
+	virtual void setConfigFromControls() = 0;
 
-		public slots:
+protected:
+	QGroupBox * createGroupBox(const QString &title = QString(), bool addToLayout = true);
+	QGridLayout * createGridLayout(QGroupBox *groupBox);
 
-			/// If possible (i.e., configs are compatible), copies the config object into
-			/// the widget config. Ownership of config object it's not transferred.
-			void setConfig( const AppConfigGroup* const config );
-
-			void setControlsFromDefaults();
-			virtual void setControlsFromConfig() = 0;
-			virtual void setConfigFromControls() = 0;
-
-		protected:
-
-			QGroupBox* createGroupBox( const QString& title=QString(), bool addToLayout=true );
-			QGridLayout* createGridLayout( QGroupBox* groupBox );
-
-		protected:
-
-			AppConfigGroup* m_config;
-
-			QGridLayout* m_mainLayout;
-	};
+protected:
+	AppConfigGroup *m_config;
+	QGridLayout *m_mainLayout;
+};
 }
-
 #endif

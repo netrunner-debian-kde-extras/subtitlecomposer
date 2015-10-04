@@ -21,52 +21,42 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actionwithtargetdialog.h"
 
 #include <KLocale>
+#include <KUrl>
 
 class QGridLayout;
 class QGroupBox;
 class KLineEdit;
 class KComboBox;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class SelectableSubtitleDialog : public ActionWithTargetDialog
 {
-	class SelectableSubtitleDialog : public ActionWithTargetDialog
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	SelectableSubtitleDialog(const QString &title, QWidget *parent = 0);
 
-			SelectableSubtitleDialog( const QString& defaultEncoding, const QString& title, QWidget* parent=0 );
+	KUrl subtitleUrl() const;
+	QString subtitleEncoding() const;
 
-			QString defaultEncoding() const;
-			void setDefaultEncoding( const QString& defaultEncoding );
+protected:
+	QGroupBox * createSubtitleGroupBox(const QString &title = i18n("Subtitle"), bool addToLayout = true);
 
-			QString subtitlePath() const;
-			QString subtitleEncoding() const;
+private slots:
+	void selectSubtitle();
 
-		protected:
+protected:
+	QGroupBox *m_subtitleGroupBox;
+	QGridLayout *m_subtitleLayout;
 
-			QGroupBox* createSubtitleGroupBox( const QString& title=i18n( "Subtitle" ), bool addToLayout=true );
-
-		private slots:
-
-			void selectSubtitle();
-
-		protected:
-
-			QGroupBox* m_subtitleGroupBox;
-			QGridLayout* m_subtitleLayout;
-
-			KLineEdit* m_subtitleUrlLineEdit;
-			KComboBox* m_subtitleEncodingComboBox;
-
-			QString m_defaultEncoding;
-	};
+	KLineEdit *m_subtitleUrlLineEdit;
+	KComboBox *m_subtitleEncodingComboBox;
+};
 }
-
 #endif

@@ -2,26 +2,26 @@
 #define LINESWIDGET_H
 
 /***************************************************************************
-*   Copyright (C) 2007-2009 Sergio Pistone (sergio_pistone@yahoo.com.ar)  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU General Public License     *
-*   along with this program; if not, write to the                         *
-*   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      *
-*   Boston, MA 02110-1301, USA.                                           *
-***************************************************************************/
+ *   Copyright (C) 2007-2009 Sergio Pistone (sergio_pistone@yahoo.com.ar)  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      *
+ *   Boston, MA 02110-1301, USA.                                           *
+ ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../core/rangelist.h"
@@ -39,184 +39,180 @@
 class QTextDocument;
 class QTimer;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class LinesModel : public QAbstractListModel
 {
-	class LinesModel : public QAbstractListModel
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	enum { Number = 0, ShowTime, HideTime, Text, Translation, ColumnCount };
+	enum { PlayingLineRole = Qt::UserRole, MarkedRole, ErrorRole };
 
-			enum { Number=0, ShowTime, HideTime, Text, Translation, ColumnCount };
-			enum { PlayingLineRole=Qt::UserRole, MarkedRole, ErrorRole };
+	explicit LinesModel(QObject *parent = 0);
 
-			explicit LinesModel( QObject* parent=0 );
+	Subtitle * subtitle() const;
+	void setSubtitle(Subtitle *subtitle);
 
-			Subtitle* subtitle() const;
-			void setSubtitle( Subtitle* subtitle );
+	SubtitleLine * playingLine() const;
+	void setPlayingLine(SubtitleLine *line);
 
-			SubtitleLine* playingLine() const;
-			void setPlayingLine( SubtitleLine* line );
+	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
-			virtual int rowCount( const QModelIndex& parent=QModelIndex() ) const;
-			virtual int columnCount( const QModelIndex& parent=QModelIndex() ) const;
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
-			virtual Qt::ItemFlags flags( const QModelIndex& index ) const;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-			virtual QVariant headerData( int section, Qt::Orientation orientation, int role=Qt::DisplayRole ) const;
+	virtual QVariant data(const QModelIndex &index, int role) const;
+	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-			virtual QVariant data( const QModelIndex& index, int role ) const;
-     		virtual bool setData( const QModelIndex& index, const QVariant& value, int role=Qt::EditRole );
+private slots:
+	void onLinesInserted(int firstIndex, int lastIndex);
+	void onLinesRemoved(int firstIndex, int lastIndex);
 
-		private slots:
+	void onLineChanged(SubtitleLine *line);
+	void emitDataChanged();
 
-			void onLinesInserted( int firstIndex, int lastIndex );
-			void onLinesRemoved( int firstIndex, int lastIndex );
+private:
+	static QString buildToolTip(SubtitleLine *line, bool primary);
 
-			void onLineChanged( SubtitleLine* line );
-			void emitDataChanged();
+private:
+	Subtitle *m_subtitle;
+	SubtitleLine *m_playingLine;
+	QTimer *m_dataChangedTimer;
+	int m_minChangedLineIndex;
+	int m_maxChangedLineIndex;
+};
 
-		private:
+class LinesWidget;
 
-			static QString buildToolTip( SubtitleLine* line, bool primary );
+class LinesItemDelegate : public QStyledItemDelegate
+{
+public:
+	typedef enum {
+		NoHint = QAbstractItemDelegate::NoHint,
+		EditNextItem = QAbstractItemDelegate::EditNextItem,
+		EditPreviousItem = QAbstractItemDelegate::EditPreviousItem,
+		SubmitModelCache = QAbstractItemDelegate::SubmitModelCache,
+		RevertModelCache = QAbstractItemDelegate::RevertModelCache,
+		EditUpperItem,
+		EditLowerItem,
+	} ExtendedEditHint;
 
-		private:
+	LinesItemDelegate(bool useStyle, bool singleLineMode, bool richTextMode, LinesWidget *parent);
+	virtual ~LinesItemDelegate();
 
-			Subtitle* m_subtitle;
-			SubtitleLine* m_playingLine;
-			QTimer* m_dataChangedTimer;
-			int m_minChangedLineIndex;
-			int m_maxChangedLineIndex;
-	};
+	inline LinesWidget * linesWidget() const { return qobject_cast<LinesWidget *>(parent()); }
 
-	class LinesWidget;
+	bool useStyle() const;
+	void setUseStyle(bool useStyle);
 
-	class LinesItemDelegate : public QStyledItemDelegate
-	{
-		public:
+	bool singleLineMode() const;
+	void setSingleLineMode(bool singleLineMode);
 
-			typedef enum {
-				NoHint = QAbstractItemDelegate::NoHint,
-				EditNextItem = QAbstractItemDelegate::EditNextItem,
-				EditPreviousItem = QAbstractItemDelegate::EditPreviousItem,
-				SubmitModelCache = QAbstractItemDelegate::SubmitModelCache,
-				RevertModelCache = QAbstractItemDelegate::RevertModelCache,
-				EditUpperItem,
-				EditLowerItem,
-			} ExtendedEditHint;
+	bool richTextMode() const;
+	void setRichTextMode(bool richTextMode);
 
-			LinesItemDelegate( bool useStyle, bool singleLineMode, bool richTextMode, LinesWidget* parent );
-			virtual ~LinesItemDelegate();
+	virtual QString displayText(const QVariant &value, const QLocale &locale) const;
 
-			inline LinesWidget* linesWidget() const { return qobject_cast<LinesWidget*>( parent() ); }
+	static const QIcon & markIcon();
+	static const QIcon & errorIcon();
 
-			bool useStyle() const;
-			void setUseStyle( bool useStyle );
+	static const QPixmap & markPixmap();
+	static const QPixmap & errorPixmap();
 
-			bool singleLineMode() const;
-			void setSingleLineMode( bool singleLineMode );
+protected:
+	virtual bool eventFilter(QObject *object, QEvent *event);
 
-			bool richTextMode() const;
-			void setRichTextMode( bool richTextMode );
+	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-			virtual QString displayText( const QVariant& value, const QLocale& locale ) const;
+	void drawBackgroundPrimitive(QPainter *painter, const QStyle *style, const QStyleOptionViewItemV4 &option) const;
 
-			static const QIcon& markIcon();
-			static const QIcon& errorIcon();
+	void drawTextPrimitive(QPainter *painter, const QStyle *style, const QStyleOptionViewItemV4 &option, const QRect &rect, QPalette::ColorGroup cg) const;
 
-			static const QPixmap& markPixmap();
-			static const QPixmap& errorPixmap();
+private:
+	bool m_useStyle;
+	bool m_singleLineMode;
+	QTextDocument *m_textDocument;
+};
 
-		protected:
+class LinesWidget : public TreeView
+{
+	Q_OBJECT
 
-			virtual bool eventFilter( QObject* object, QEvent* event );
+public:
+	explicit LinesWidget(QWidget *parent);
+	virtual ~LinesWidget();
 
-			virtual void paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const;
+	bool showingContextMenu();
 
-			void drawBackgroundPrimitive( QPainter* painter, const QStyle* style,
-										  const QStyleOptionViewItemV4& option ) const;
+	SubtitleLine * currentLine() const;
+	int currentLineIndex() const;
 
-			void drawTextPrimitive( QPainter* painter, const QStyle* style,
-									const QStyleOptionViewItemV4& option, const QRect& rect, QPalette::ColorGroup cg ) const;
+	int firstSelectedIndex() const;
+	int lastSelectedIndex() const;
+	bool selectionHasMultipleRanges() const;
+	RangeList selectionRanges() const;
+	RangeList targetRanges(int target) const;
 
-		private:
+	inline LinesModel * model() const { return static_cast<LinesModel *>(TreeView::model()); }
 
-			bool m_useStyle;
-			bool m_singleLineMode;
-			QTextDocument* m_textDocument;
-	};
+	void loadConfig();
+	void saveConfig();
 
-	class LinesWidget : public TreeView
-	{
-		Q_OBJECT
+	virtual bool eventFilter(QObject *object, QEvent *event);
 
-		public:
+public slots:
+	void setSubtitle(Subtitle *subtitle = 0);
+	void setTranslationMode(bool enabled);
 
-			explicit LinesWidget( QWidget* parent );
-			virtual ~LinesWidget();
+	void setCurrentLine(SubtitleLine *line, bool clearSelection = true);
+	void setPlayingLine(SubtitleLine *line);
 
-			bool showingContextMenu();
+	void editCurrentLineInPlace(bool primaryText = true);
 
-			SubtitleLine* currentLine() const;
-			int currentLineIndex() const;
+signals:
+	void currentLineChanged(SubtitleLine *line);
+	void lineDoubleClicked(SubtitleLine *line);
 
-			int firstSelectedIndex() const;
-			int lastSelectedIndex() const;
-			bool selectionHasMultipleRanges() const;
-			RangeList selectionRanges() const;
-			RangeList targetRanges( int target ) const;
+protected slots:
+	virtual void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 
-			inline LinesModel* model() const { return static_cast<LinesModel*>( TreeView::model() ); }
+	virtual void rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+	virtual void rowsInserted(const QModelIndex &parent, int start, int end);
 
-			void loadConfig();
-			void saveConfig();
+private:
+	virtual void contextMenuEvent(QContextMenuEvent *e);
+	virtual void mouseDoubleClickEvent(QMouseEvent *e);
 
-			virtual bool eventFilter( QObject* object, QEvent* event );
+	static void drawHorizontalDotLine(QPainter *painter, int x1, int x2, int y);
+	static void drawVerticalDotLine(QPainter *painter, int x, int y1, int y2);
 
-		public slots:
+	virtual void drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-			void setSubtitle( Subtitle* subtitle=0 );
-			void setTranslationMode( bool enabled );
+private slots:
+	void onCurrentRowChanged();
 
-			void setCurrentLine( SubtitleLine* line, bool clearSelection=true );
-			void setPlayingLine( SubtitleLine* line );
+private:
+	bool m_scrollFollowsModel;
 
-			void editCurrentLineInPlace( bool primaryText=true );
+	bool m_translationMode;
 
-		signals:
+	bool m_showingContextMenu;
 
-			void currentLineChanged( SubtitleLine* line );
-			void lineDoubleClicked( SubtitleLine* line );
+	QPen m_gridPen;
 
-		protected slots:
+	friend class LinesWidgetScrollToModelDetacher;
+};
 
-			virtual void closeEditor( QWidget* editor, QAbstractItemDelegate::EndEditHint hint );
+class LinesWidgetScrollToModelDetacher
+{
+public:
+	LinesWidgetScrollToModelDetacher(LinesWidget &linesWidget);
+	~LinesWidgetScrollToModelDetacher();
 
-			virtual void rowsAboutToBeRemoved( const QModelIndex& parent, int start, int end );
-			virtual void rowsInserted( const QModelIndex& parent, int start, int end );
-
-		private:
-
-			virtual void contextMenuEvent( QContextMenuEvent* e );
-			virtual void mouseDoubleClickEvent( QMouseEvent* e );
-
-			static void drawHorizontalDotLine( QPainter* painter, int x1, int x2, int y );
-			static void drawVerticalDotLine( QPainter* painter, int x, int y1, int y2 );
-
-			virtual void drawRow( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const;
-
-		private slots:
-
-			void onCurrentRowChanged();
-
-		private:
-
-			bool m_translationMode;
-
-			bool m_showingContextMenu;
-
-			QPen m_gridPen;
-	};
+private:
+	LinesWidget &m_linesWidget;
+};
 }
-
 #endif

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include <QtCore/QString>
@@ -30,17 +30,15 @@
 // class TimeValidator : public QRegExpValidator
 class TimeValidator : public QValidator
 {
-	public:
+public:
+	TimeValidator(QObject *parent = 0);
 
-		TimeValidator( QObject* parent=0 );
+	bool parse(const QString &input, int &timeMillis);
 
-		bool parse( const QString& input, int& timeMillis );
+	QValidator::State validate(QString &input, int &pos) const;
 
-		QValidator::State validate( QString& input, int& pos ) const;
-
-	private:
-
-		mutable QRegExp m_parserRegExp;
+private:
+	mutable QRegExp m_parserRegExp;
 };
 
 #endif

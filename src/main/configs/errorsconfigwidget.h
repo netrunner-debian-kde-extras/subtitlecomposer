@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "errorsconfig.h"
@@ -30,35 +30,32 @@
 class KIntNumInput;
 class QCheckBox;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class ErrorsConfigWidget : public AppConfigGroupWidget
 {
-	class ErrorsConfigWidget : public AppConfigGroupWidget
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		friend class ConfigDialog;
+	friend class ConfigDialog;
 
-		public:
+public:
+	virtual ~ErrorsConfigWidget();
 
-			virtual ~ErrorsConfigWidget();
+	virtual void setControlsFromConfig();
+	virtual void setConfigFromControls();
 
-			virtual void setControlsFromConfig();
-			virtual void setConfigFromControls();
+private:
+	explicit ErrorsConfigWidget(QWidget *parent = 0);
 
-		private:
+	ErrorsConfig * config() { return static_cast<ErrorsConfig *>(m_config); }
 
-			explicit ErrorsConfigWidget( QWidget* parent=0 );
-
-			ErrorsConfig* config() { return static_cast<ErrorsConfig*>( m_config ); };
-
-			KIntNumInput* m_minDurationSpinBox;
-			KIntNumInput* m_maxDurationSpinBox;
-			KIntNumInput* m_maxCharactersSpinBox;
-			KIntNumInput* m_maxLinesSpinBox;
-			KIntNumInput* m_minDurationPerCharSpinBox;
-			KIntNumInput* m_maxDurationPerCharSpinBox;
-			QCheckBox* m_autoClearFixedCheckBox;
-	};
+	KIntNumInput *m_minDurationSpinBox;
+	KIntNumInput *m_maxDurationSpinBox;
+	KIntNumInput *m_maxCharactersSpinBox;
+	KIntNumInput *m_maxLinesSpinBox;
+	KIntNumInput *m_minDurationPerCharSpinBox;
+	KIntNumInput *m_maxDurationPerCharSpinBox;
+	QCheckBox *m_autoClearFixedCheckBox;
+};
 }
 
 #endif

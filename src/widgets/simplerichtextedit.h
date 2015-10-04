@@ -2,26 +2,26 @@
 #define SIMPLERICHTEXTEDIT_H
 
 /***************************************************************************
-*   Copyright (C) 2007-2009 Sergio Pistone (sergio_pistone@yahoo.com.ar)  *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU General Public License     *
-*   along with this program; if not, write to the                         *
-*   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      *
-*   Boston, MA 02110-1301, USA.                                           *
-***************************************************************************/
+ *   Copyright (C) 2007-2009 Sergio Pistone (sergio_pistone@yahoo.com.ar)  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      *
+ *   Boston, MA 02110-1301, USA.                                           *
+ ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../core/sstring.h"
@@ -40,75 +40,72 @@ class SimpleRichTextEdit : public KTextEdit
 {
 	Q_OBJECT
 
-	public:
+public:
+	typedef enum {
+		Undo = 0, Redo,
+		Cut, Copy, Paste, Delete, Clear, SelectAll,
+		ToggleBold, ToggleItalic, ToggleUnderline, ToggleStrikeOut,
+		CheckSpelling, ToggleAutoSpellChecking,
+		AllowTabulations, ChangeTextColor,
+		ActionCount
+	} Action;
 
-		typedef enum {
-			Undo = 0, Redo,
-			Cut, Copy, Paste, Delete, Clear, SelectAll,
-			ToggleBold, ToggleItalic, ToggleUnderline, ToggleStrikeOut,
-			CheckSpelling, ToggleAutoSpellChecking,
-			AllowTabulations,
-			ActionCount
-		} Action;
+	explicit SimpleRichTextEdit(QWidget *parent = 0);
+	virtual ~SimpleRichTextEdit();
 
-		explicit SimpleRichTextEdit( QWidget* parent=0 );
-		virtual ~SimpleRichTextEdit();
+	bool hasSelection() const;
+	QString selectedText() const;
 
-		bool hasSelection() const;
-		QString selectedText() const;
+	bool fontBold();
+	bool fontStrikeOut();
 
-		bool fontBold();
-		bool fontStrikeOut();
+	virtual KAction * action(int action) const;
+	virtual QList<KAction *> actions() const;
 
-		virtual KAction* const action( int action ) const;
+	virtual bool event(QEvent *event);
 
-		virtual bool event( QEvent* event );
+public slots:
+	SubtitleComposer::SString richText();
+	void setRichText(const SubtitleComposer::SString &richText);
 
-	public slots:
+	void setSelection(int startIndex, int endIndex);
+	void clearSelection();
 
-		SubtitleComposer::SString richText();
-		void setRichText( const SubtitleComposer::SString& richText );
+	void setFontBold(bool enabled);
+	void setFontStrikeOut(bool enabled);
 
-		void setSelection( int startIndex, int endIndex );
-		void clearSelection();
+	void toggleFontBold();
+	void toggleFontItalic();
+	void toggleFontUnderline();
+	void toggleFontStrikeOut();
+	void changeTextColor();
 
-		void setFontBold( bool enabled );
-		void setFontStrikeOut( bool enabled );
+	void deleteText();
+	void undoableClear();
 
-		void toggleFontBold();
-		void toggleFontItalic();
-		void toggleFontUnderline();
-		void toggleFontStrikeOut();
+	void clearUndoRedoHistory();
 
-		void deleteText();
-		void undoableClear();
+	void toggleTabChangesFocus();
+	void toggleAutoSpellChecking();
 
-		void clearUndoRedoHistory();
+protected:
+	QMenu * createContextMenu(const QPoint &mousePos);
 
-		void toggleTabChangesFocus();
-		void toggleAutoSpellChecking();
+	virtual void contextMenuEvent(QContextMenuEvent *event);
 
-	protected:
+	virtual void keyPressEvent(QKeyEvent *event);
 
-		QMenu* createContextMenu( const QPoint& mousePos );
+	void setupWordUnderPositionCursor(const QPoint &globalPos);
 
-		virtual void contextMenuEvent( QContextMenuEvent *event );
+protected slots:
+	void addToIgnoreList();
+	void addToDictionary();
+	void replaceWithSuggestion();
 
-		virtual void keyPressEvent( QKeyEvent* event );
-
-		void setupWordUnderPositionCursor( const QPoint& globalPos );
-
-	protected slots:
-
-		void addToIgnoreList();
-		void addToDictionary();
-		void replaceWithSuggestion();
-
-	protected:
-
-		KAction* m_actions[ActionCount];
-		QMenu* m_insertUnicodeControlCharMenu;
-		QTextCursor m_selectedWordCursor;
+protected:
+	KAction *m_actions[ActionCount];
+	QMenu *m_insertUnicodeControlCharMenu;
+	QTextCursor m_selectedWordCursor;
 };
 
 #endif

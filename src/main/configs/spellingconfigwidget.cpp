@@ -18,24 +18,9 @@
  ***************************************************************************/
 
 #include "spellingconfigwidget.h"
-#include "../../player/player.h"
-#include "../../widgets/layeredwidget.h"
-#include "../../widgets/textoverlaywidget.h"
 
-#include <QtGui/QGridLayout>
-#include <QtGui/QPalette>
-#include <QtGui/QGroupBox>
-#include <QtGui/QLabel>
-#include <QtGui/QCheckBox>
-#include <QtGui/QFontComboBox>
+#include <QtGui/QLayout>
 
-#include <KPushButton>
-#include <KComboBox>
-#include <KColorCombo>
-#include <KNumInput>
-
-#include <KDebug>
-#include <KLocale>
 #include <KGlobal>
 #include <KConfig>
 #include <KConfigGroup>
@@ -45,19 +30,19 @@ using namespace SubtitleComposer;
 
 #define SONNET_CONFIG_GROUP "Spelling"
 
-SpellingConfigWidget::SpellingConfigWidget( QWidget* parent ):
-	AppConfigGroupWidget( new SpellingConfig(), parent ),
-	m_sonnetConfigWidget( 0 ),
-	m_globalConfig( KGlobal::config().data() )
+SpellingConfigWidget::SpellingConfigWidget(QWidget *parent) :
+	AppConfigGroupWidget(new SpellingConfig(), parent),
+	m_sonnetConfigWidget(0),
+	m_globalConfig(KGlobal::config().data())
 {
 	setControlsFromConfig();
 }
 
 SpellingConfigWidget::~SpellingConfigWidget()
-{
-}
+{}
 
-void SpellingConfigWidget::setControlsFromConfig()
+void
+SpellingConfigWidget::setControlsFromConfig()
 {
 	// NOTE: Sonnet::ConfigWidget doesn't provide a way to change the controls state to reflect
 	// a new settings state, as it is only evaluated at initialization. We work around that by
@@ -66,41 +51,42 @@ void SpellingConfigWidget::setControlsFromConfig()
 	// config state in this method so, after the Sonnet::ConfigWidget is (re)created, we restore
 	// the KConfig state to how it was before.
 
-	KConfigGroup group( m_globalConfig->group( SONNET_CONFIG_GROUP ) );
-	QMap<QString,QString> previousSettings = group.entryMap();
-	group.writeEntry( SpellingConfig::keyDefaultLanguage(), config()->defaultLanguage() );
-	group.writeEntry( SpellingConfig::keyDefaultClient(), config()->defaultClient() );
-	group.writeEntry( SpellingConfig::keyCheckUppercase(), config()->checkUppercase() );
-	group.writeEntry( SpellingConfig::keySkipRunTogether(), config()->skipRunTogether() );
+	KConfigGroup group(m_globalConfig->group(SONNET_CONFIG_GROUP));
+	QMap<QString, QString> previousSettings = group.entryMap();
+	group.writeEntry(SpellingConfig::keyDefaultLanguage(), config()->defaultLanguage());
+	group.writeEntry(SpellingConfig::keyDefaultClient(), config()->defaultClient());
+	group.writeEntry(SpellingConfig::keyCheckUppercase(), config()->checkUppercase());
+	group.writeEntry(SpellingConfig::keySkipRunTogether(), config()->skipRunTogether());
 
-	setUpdatesEnabled( false );
+	setUpdatesEnabled(false);
 
 	delete m_sonnetConfigWidget;
-	m_sonnetConfigWidget = new Sonnet::ConfigWidget( m_globalConfig, this );
-	layout()->addWidget( m_sonnetConfigWidget );
+	m_sonnetConfigWidget = new Sonnet::ConfigWidget(m_globalConfig, this);
+	layout()->addWidget(m_sonnetConfigWidget);
 
-	setUpdatesEnabled( true );
+	setUpdatesEnabled(true);
 
-	group.writeEntry( SpellingConfig::keyDefaultLanguage(), previousSettings[SpellingConfig::keyDefaultLanguage()] );
-	group.writeEntry( SpellingConfig::keyDefaultClient(), previousSettings[SpellingConfig::keyDefaultClient()] );
-	group.writeEntry( SpellingConfig::keyCheckUppercase(), previousSettings[SpellingConfig::keyCheckUppercase()] );
-	group.writeEntry( SpellingConfig::keySkipRunTogether(), previousSettings[SpellingConfig::keySkipRunTogether()] );
+	group.writeEntry(SpellingConfig::keyDefaultLanguage(), previousSettings[SpellingConfig::keyDefaultLanguage()]);
+	group.writeEntry(SpellingConfig::keyDefaultClient(), previousSettings[SpellingConfig::keyDefaultClient()]);
+	group.writeEntry(SpellingConfig::keyCheckUppercase(), previousSettings[SpellingConfig::keyCheckUppercase()]);
+	group.writeEntry(SpellingConfig::keySkipRunTogether(), previousSettings[SpellingConfig::keySkipRunTogether()]);
 
-	connect( m_sonnetConfigWidget, SIGNAL( configChanged() ), this, SIGNAL( settingsChanged() ) );
+	connect(m_sonnetConfigWidget, SIGNAL(configChanged()), this, SIGNAL(settingsChanged()));
 }
 
-void SpellingConfigWidget::setConfigFromControls()
+void
+SpellingConfigWidget::setConfigFromControls()
 {
 	// NOTE: we make sure the Sonnet::ConfigWidget dumps it's settings to the KConfig object.
 	// Only then we can load our config object from it.
 
 	m_sonnetConfigWidget->save();
 
-	KConfigGroup group( m_globalConfig->group( SONNET_CONFIG_GROUP ) );
-	config()->setOption( SpellingConfig::keyDefaultLanguage(), group.readEntry( SpellingConfig::keyDefaultLanguage() ) );
-	config()->setOption( SpellingConfig::keyDefaultClient(), group.readEntry( SpellingConfig::keyDefaultClient() ) );
-	config()->setOption( SpellingConfig::keyCheckUppercase(), group.readEntry( SpellingConfig::keyCheckUppercase() ) );
-	config()->setOption( SpellingConfig::keySkipRunTogether(), group.readEntry( SpellingConfig::keySkipRunTogether() ) );
+	KConfigGroup group(m_globalConfig->group(SONNET_CONFIG_GROUP));
+	config()->setOption(SpellingConfig::keyDefaultLanguage(), group.readEntry(SpellingConfig::keyDefaultLanguage()));
+	config()->setOption(SpellingConfig::keyDefaultClient(), group.readEntry(SpellingConfig::keyDefaultClient()));
+	config()->setOption(SpellingConfig::keyCheckUppercase(), group.readEntry(SpellingConfig::keyCheckUppercase()));
+	config()->setOption(SpellingConfig::keySkipRunTogether(), group.readEntry(SpellingConfig::keySkipRunTogether()));
 }
 
 #include "spellingconfigwidget.moc"

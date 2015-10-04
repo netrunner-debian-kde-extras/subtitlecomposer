@@ -17,7 +17,7 @@
     along with this library; see the file COPYING.LIB.  If not, write to
     the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
     Boston, MA 02110-1301, USA.
-*/
+ */
 
 #ifndef KFIND_P_H
 #define KFIND_P_H
@@ -31,89 +31,90 @@
 #include <QtCore/QPointer>
 #include <QtCore/QString>
 
+struct KFind::Private {
+	Private(KFind *q) :
+		q(q),
+		findDialog(0),
+		currentId(0),
+		customIds(false),
+		patternChanged(false),
+		matchedPattern(""),
+		emptyMatch(0) {}
 
-struct KFind::Private
-{
-    Private(KFind *q)
-        : q(q)
-        , findDialog(0)
-        , currentId(0)
-        , customIds(false)
-        , patternChanged(false)
-        , matchedPattern("")
-        , emptyMatch(0)
-    {
-    }
+	~Private()
+	{
+		delete dialog;
+		data.clear();
+		delete emptyMatch;
+		emptyMatch = 0;
+	}
 
-    ~Private()
-    {
-        delete dialog;
-        data.clear();
-        delete emptyMatch;
-        emptyMatch = 0;
-    }
+	struct Match {
+		Match() : dataId(-1),
+			index(-1),
+			matchedLength(-1) {}
 
-    struct Match
-    {
-        Match() : dataId(-1), index(-1), matchedLength(-1) {}
-        bool isNull() const { return index == -1; }
-        Match(int _dataId, int _index, int _matchedLength) :
-          dataId(_dataId),
-          index(_index),
-          matchedLength(_matchedLength)
-        {
-            Q_ASSERT( index != -1 );
-        }
+		bool isNull() const
+		{
+			return index == -1;
+		}
 
-        int dataId;
-        int index;
-        int matchedLength;
-    };
+		Match(int _dataId, int _index, int _matchedLength) : dataId(_dataId),
+			index(_index),
+			matchedLength(_matchedLength)
+		{
+			Q_ASSERT(index != -1);
+		}
 
-    struct Data
-    {
-        Data() : id(-1), dirty(false) { }
-        Data(int id, const QString &text, bool dirty = false) :
-          id(id),
-          text(text),
-          dirty(dirty)
-        { }
+		int dataId;
+		int index;
+		int matchedLength;
+	};
 
-        int     id;
-        QString text;
-        bool    dirty;
-    };
+	struct Data {
+		Data() : id(-1),
+			dirty(false) {}
 
-    void init( const QString& pattern );
-    void startNewIncrementalSearch();
+		Data(int id, const QString &text, bool dirty = false) :
+			id(id),
+			text(text),
+			dirty(dirty) {}
 
-    static bool isInWord( QChar ch );
-    static bool isWholeWords( const QString &text, int starts, int matchedLength );
+		int id;
+		QString text;
+		bool dirty;
+	};
 
-    void _k_slotFindNext();
-    void _k_slotDialogClosed();
+	void init(const QString &pattern);
+	void startNewIncrementalSearch();
 
-    KFind *q;
-    QPointer<QWidget>  findDialog;
-    int                   currentId;
-    bool                  customIds : 1;
-    bool                  patternChanged : 1;
-    QString               matchedPattern;
-    QHash<QString,Match>  incrementalPath;
-    Match *               emptyMatch;
-    QList<Data>           data; // used like a vector, not like a linked-list
+	static bool isInWord(QChar ch);
+	static bool isWholeWords(const QString &text, int starts, int matchedLength);
 
-    QString pattern;
-    QRegExp *regExp;
-    KDialog* dialog;
-    long options;
-    unsigned matches;
+	void _k_slotFindNext();
+	void _k_slotDialogClosed();
 
-    QString text; // the text set by setData
-    int index;
-    int matchedLength;
-    bool dialogClosed : 1;
-    bool lastResult : 1;
+	KFind *q;
+	QPointer<QWidget> findDialog;
+	int currentId;
+	bool customIds : 1;
+	bool patternChanged : 1;
+	QString matchedPattern;
+	QHash<QString, Match> incrementalPath;
+	Match *emptyMatch;
+	QList<Data> data;            // used like a vector, not like a linked-list
+
+	QString pattern;
+	QRegExp *regExp;
+	KDialog *dialog;
+	long options;
+	unsigned matches;
+
+	QString text;                           // the text set by setData
+	int index;
+	int matchedLength;
+	bool dialogClosed : 1;
+	bool lastResult : 1;
 };
 
-#endif // KFIND_P_H
+#endif                                                  // KFIND_P_H

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include <QtCore/QObject>
@@ -32,70 +32,63 @@
 class KConfig;
 class KSharedConfig;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class AppConfig;
+class AppConfigGroup : public QObject
 {
-	class AppConfig;
-	class AppConfigGroup : public QObject
-	{
-		Q_OBJECT
+	Q_OBJECT
+	friend class AppConfig;
 
-		friend class AppConfig;
+public:
+/// NOTE: keys not in the defaults map are not valid
+	AppConfigGroup(const QString &name, const QMap<QString, QString> &defaults);
+	AppConfigGroup(const AppConfigGroup &config);
+	AppConfigGroup & operator=(const AppConfigGroup &config);
+	~AppConfigGroup();
 
-		public:
+	virtual AppConfigGroup * clone() const;
 
-			/// NOTE: keys not in the defaults map are not valid
-			AppConfigGroup( const QString& name, const QMap<QString,QString>& defaults );
-			AppConfigGroup( const AppConfigGroup& config );
-			AppConfigGroup& operator=( const AppConfigGroup& config );
-			~AppConfigGroup();
+	const QString & name() const;
 
-			virtual AppConfigGroup* clone() const;
+/// returns true if config object has all the keys in this object and viceversa
+	bool isCompatibleWith(const AppConfigGroup &config) const;
 
-			const QString& name() const;
+	void loadDefaults();
+	void readFrom(const KConfig *config);
+	void readFrom(const KSharedConfig *config);
+	void writeTo(KConfig *config) const;
+	void writeTo(KSharedConfig *config) const;
 
-			/// returns true if config object has all the keys in this object and viceversa
-			bool isCompatibleWith( const AppConfigGroup& config ) const;
+	QString option(const QString &optionName) const;
+	bool optionAsBool(const QString &optionName) const;
+	long optionAsLong(const QString &optionName) const;
+	int optionAsInt(const QString &optionName) const;
+	QColor optionAsColor(const QString &optionName) const;
 
-			void loadDefaults();
-			void readFrom( const KConfig* config );
-			void readFrom( const KSharedConfig* config );
-			void writeTo( KConfig* config ) const;
-			void writeTo( KSharedConfig* config ) const;
+	void setOption(const QString &optionName, const QString &value);
+	void setOption(const QString &optionName, const char *value);
+	void setOption(const QString &optionName, bool value);
+	void setOption(const QString &optionName, int value);
+	void setOption(const QString &optionName, long value);
+	void setOption(const QString &optionName, const QColor &value);
 
-			QString option( const QString& optionName ) const;
-			bool optionAsBool( const QString& optionName ) const;
-			long optionAsLong( const QString& optionName ) const;
-			int optionAsInt( const QString& optionName ) const;
-			QColor optionAsColor( const QString& optionName ) const;
+	bool operator==(const AppConfigGroup &configGroup) const;
+	bool operator!=(const AppConfigGroup &configGroup) const;
 
-			void setOption( const QString& optionName, const QString& value );
-			void setOption( const QString& optionName, const char* value );
-			void setOption( const QString& optionName, bool value );
-			void setOption( const QString& optionName, int value );
-			void setOption( const QString& optionName, long value );
-			void setOption( const QString& optionName, const QColor& value );
+signals:
+	void optionChanged(const QString &optionName, const QString &value);
+	void optionChanged(const QString &groupName, const QString &optionName, const QString &value);
 
-			bool operator==( const AppConfigGroup& configGroup ) const;
-			bool operator!=( const AppConfigGroup& configGroup ) const;
+protected:
+	static bool equals(const QString &str1, const QString &str2);
+	static bool nonEquals(const QString &str1, const QString &str2);
 
-		signals:
+protected:
+	AppConfig *m_config;
 
-			void optionChanged( const QString& optionName, const QString& value );
-			void optionChanged( const QString& groupName, const QString& optionName, const QString& value );
-
-		protected:
-
-			static bool equals( const QString& str1, const QString& str2 );
-			static bool nonEquals( const QString& str1, const QString& str2 );
-
-		protected:
-
-			AppConfig* m_config;
-
-			QString m_name;
-			QMap<QString,QString> m_values;
-			QMap<QString,QString> m_defaultValues;
-	};
+	QString m_name;
+	QMap<QString, QString> m_values;
+	QMap<QString, QString> m_defaultValues;
+};
 }
-
 #endif

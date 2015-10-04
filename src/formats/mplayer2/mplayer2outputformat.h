@@ -20,53 +20,45 @@
  *   Boston, MA 02110-1301, USA.                                           *
  ***************************************************************************/
 
-
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../outputformat.h"
 #include "../../core/subtitleiterator.h"
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class MPlayer2OutputFormat : public OutputFormat
 {
-	class MPlayer2OutputFormat : public OutputFormat
+	friend class FormatManager;
+
+public:
+	virtual ~MPlayer2OutputFormat() {}
+
+protected:
+	virtual QString dumpSubtitles(const Subtitle &subtitle, bool primary) const
 	{
-		friend class FormatManager;
+		QString ret;
 
-		public:
+		for(SubtitleIterator it(subtitle); it.current(); ++it) {
+			const SubtitleLine *line = it.current();
 
-			virtual ~MPlayer2OutputFormat() {}
+			const SString &text = primary ? line->primaryText() : line->secondaryText();
 
-			virtual QString dumpSubtitles( const Subtitle& subtitle, bool primary ) const
-			{
-				QString ret;
+			ret += m_lineBuilder.arg((long)((line->showTime().toMillis() / 100.0) + 0.5))
+					.arg((long)((line->hideTime().toMillis() / 100.0) + 0.5))
+					.arg(text.string().replace('\n', '|'));
+		}
+		return ret;
+	}
 
-				for ( SubtitleIterator it( subtitle ); it.current(); ++it )
-				{
-					const SubtitleLine* line = it.current();
+	MPlayer2OutputFormat() :
+		OutputFormat("MPlayer2", QStringList("mpl")),
+		m_lineBuilder("[%1][%2]%3\n")
+	{}
 
-					const SString& text = primary ? line->primaryText() : line->secondaryText();
-
-					ret += m_lineBuilder
-						.arg( (long)((line->showTime().toMillis()/100.0) + 0.5) )
-						.arg( (long)((line->hideTime().toMillis()/100.0) + 0.5) )
-						.arg( text.string().replace( '\n', '|' ) );
-				}
-
-				return ret;
-			}
-
-		protected:
-
-			MPlayer2OutputFormat():
-				OutputFormat( "MPlayer2", QStringList( "mpl" ) ),
-				m_lineBuilder( "[%1][%2]%3\n" )
-			{
-			}
-
-			const QString m_lineBuilder;
-	};
+	const QString m_lineBuilder;
+};
 }
 
 #endif

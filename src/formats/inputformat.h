@@ -21,83 +21,37 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "format.h"
-#include "../common/fileloadhelper.h"
 
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QTextCodec>
-#include <QtCore/QTextStream>
-
-#include <KUrl>
-
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class InputFormat : public Format
 {
-	class InputFormat : public Format
+public:
+	virtual ~InputFormat() {}
+
+	bool readSubtitle(Subtitle &subtitle, bool primary, const QString &data) const
 	{
-		public:
+		Subtitle newSubtitle;
 
-			virtual ~InputFormat() {}
+		if(!parseSubtitles(newSubtitle, data))
+			return false;
 
-			bool readSubtitle( Subtitle& subtitle, NewLine* newLine, bool primary, const KUrl& url, QTextCodec* codec, bool ignoreExtension ) const
-			{
-				if ( ! ignoreExtension )
-				{
-					QString extension( QFileInfo( url.path() ).suffix() );
+		if(primary)
+			subtitle.setPrimaryData(newSubtitle, true);
+		else
+			subtitle.setSecondaryData(newSubtitle, true);
 
-					if ( ! knowsExtension( extension ) )
-						return false;
-				}
+		return true;
+	}
 
-				FileLoadHelper fileLoadHelper( url );
+protected:
+	virtual bool parseSubtitles(Subtitle &subtitle, const QString &data) const = 0;
 
-				if ( ! fileLoadHelper.open() )
-					return false;
-
-				QTextStream textStream( fileLoadHelper.file() );
-				textStream.setCodec( codec );
-				QString data = textStream.readAll();
-
-				fileLoadHelper.close();
-
-				if ( newLine )
-				{
-					if ( data.indexOf( "\r\n" ) != -1 )
-						*newLine = Windows;
-					else if ( data.indexOf( "\r" ) != -1 )
-						*newLine = Macintosh;
-					else if ( data.indexOf( "\n" ) != -1 )
-						*newLine = UNIX;
-					else
-						*newLine = CurrentOS;
-				}
-
-				data.replace( "\r\n", "\n" );
-				data.replace( "\r", "\n" );
-
-				Subtitle newSubtitle;
-
-				if ( ! parseSubtitles( newSubtitle, data ) )
-					return false;
-
-				if ( primary )
-					subtitle.setPrimaryData( newSubtitle, true );
-				else
-					subtitle.setSecondaryData( newSubtitle, true );
-
-				return true;
-			}
-
-			virtual bool parseSubtitles( Subtitle& subtitle, const QString& data ) const = 0;
-
-		protected:
-
-			InputFormat( const QString& name, const QStringList& extensions ):
-				Format( name, extensions ) {}
-	};
+	InputFormat(const QString &name, const QStringList &extensions) : Format(name, extensions) {}
+};
 }
 
 #endif

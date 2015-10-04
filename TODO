@@ -1,8 +1,6 @@
 Planned features / known issues
 
-* integrate waveform visuals (check out wave drawing in kdenlive editor)
+* integrate waveform visuals
 * automatic correction of OCR errors
-* rename "current line" to "active line"
-* it's annoying to have a subtitle fail to load because of an invalid encoding issue, perhaps the "next" encoding should be tried and the error informed.
-* the player controls won't appear on fullscreen mode with KDE4.2 (disabling KWin desktop effects "fixes" the issue)
-* translation service could improve syncronization issues if it cooperated more closely with the subtitle
+
+add a way to synchronize video and subtitle fps values for formats that neede it like MicroDVD

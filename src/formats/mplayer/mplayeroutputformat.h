@@ -20,55 +20,47 @@
  *   Boston, MA 02110-1301, USA.                                           *
  ***************************************************************************/
 
-
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "../outputformat.h"
 #include "../../core/subtitleiterator.h"
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class MPlayerOutputFormat : public OutputFormat
 {
-	class MPlayerOutputFormat : public OutputFormat
+	friend class FormatManager;
+
+public:
+	virtual ~MPlayerOutputFormat() {}
+
+protected:
+	virtual QString dumpSubtitles(const Subtitle &subtitle, bool primary) const
 	{
-		friend class FormatManager;
+		QString ret;
 
-		public:
+		double framesPerSecond = subtitle.framesPerSecond();
 
-			virtual ~MPlayerOutputFormat() {}
+		for(SubtitleIterator it(subtitle); it.current(); ++it) {
+			const SubtitleLine *line = it.current();
 
-			virtual QString dumpSubtitles( const Subtitle& subtitle, bool primary ) const
-			{
-				QString ret;
+			const SString &text = primary ? line->primaryText() : line->secondaryText();
 
-				double framesPerSecond = subtitle.framesPerSecond();
+			ret += m_lineBuilder.arg((long)((line->showTime().toMillis() / 1000.0) * framesPerSecond + 0.5))
+					.arg((long)((line->hideTime().toMillis() / 1000.0) * framesPerSecond + 0.5))
+					.arg(text.string().replace('\n', '|'));
+		}
+		return ret;
+	}
 
-				for ( SubtitleIterator it( subtitle ); it.current(); ++it )
-				{
-					const SubtitleLine* line = it.current();
+	MPlayerOutputFormat() :
+		OutputFormat("MPlayer", QStringList("mpl")),
+		m_lineBuilder("%1,%2,0,%3\n")
+	{}
 
-					const SString& text = primary ? line->primaryText() : line->secondaryText();
-
-					ret += m_lineBuilder
-						.arg( (long)((line->showTime().toMillis()/1000.0)*framesPerSecond + 0.5) )
-						.arg( (long)((line->hideTime().toMillis()/1000.0)*framesPerSecond + 0.5) )
-						.arg( text.string().replace( '\n', '|' ) );
-				}
-
-				return ret;
-			}
-
-		protected:
-
-			MPlayerOutputFormat():
-				OutputFormat( "MPlayer", QStringList( "mpl" ) ),
-				m_lineBuilder( "%1,%2,0,%3\n" )
-			{
-			}
-
-			const QString m_lineBuilder;
-	};
+	const QString m_lineBuilder;
+};
 }
 
 #endif

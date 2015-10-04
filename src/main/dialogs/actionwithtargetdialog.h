@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actiondialog.h"
@@ -35,126 +35,109 @@ class QGridLayout;
 class QGroupBox;
 class QButtonGroup;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class ActionWithTargetDialog : public ActionDialog
 {
-	class ActionWithTargetDialog : public ActionDialog
-	{
-		Q_OBJECT
+	Q_OBJECT
 
-		public:
+public:
+	typedef enum { AllLines = 0, Selection, FromSelected, UpToSelected, None } LinesTarget;
 
-			typedef enum { AllLines=0, Selection, FromSelected, UpToSelected, None } LinesTarget;
+/// LINES TARGET
+	LinesTarget selectedLinesTarget() const;
+	void setSelectedLinesTarget(ActionWithTargetDialog::LinesTarget target);
 
-			/// LINES TARGET
-			LinesTarget selectedLinesTarget() const;
-			void setSelectedLinesTarget( ActionWithTargetDialog::LinesTarget target );
+	bool isLinesTargetEnabled(LinesTarget target) const;
+	void setLinesTargetEnabled(LinesTarget target, bool enabled);
 
-			bool isLinesTargetEnabled( LinesTarget target ) const;
-			void setLinesTargetEnabled( LinesTarget target, bool enabled );
+/// TEXTS TARGET
+// the active text target when translationMode is false
+	Subtitle::TextTarget nonTranslationModeTarget() const;
+	void setNonTranslationModeTarget(Subtitle::TextTarget target);
 
-			/// TEXTS TARGET
-			// the active text target when translationMode is false
-			Subtitle::TextTarget nonTranslationModeTarget() const;
-			void setNonTranslationModeTarget( Subtitle::TextTarget target );
+	Subtitle::TextTarget selectedTextsTarget() const;
+	void setSelectedTextsTarget(Subtitle::TextTarget target);
 
-			Subtitle::TextTarget selectedTextsTarget() const;
-			void setSelectedTextsTarget( Subtitle::TextTarget target );
+	bool isTextsTargetEnabled(Subtitle::TextTarget target) const;
+	void setTextsTargetEnabled(Subtitle::TextTarget target, bool enabled);
 
-			bool isTextsTargetEnabled( Subtitle::TextTarget target ) const;
-			void setTextsTargetEnabled( Subtitle::TextTarget target, bool enabled );
+public slots:
+	virtual int exec();
+	virtual void show();
 
-		public slots:
+protected:
+	explicit ActionWithTargetDialog(const QString &title, QWidget *parent = 0);
 
-			virtual int exec();
-			virtual void show();
+	bool selectionTargetOnlyMode() const;
+	bool translationMode() const;
 
-		protected:
+	QGroupBox * createTargetsGroupBox(const QString &title = i18n("Apply To"), bool addToLayout = true);
 
-			explicit ActionWithTargetDialog( const QString& title, QWidget* parent=0 );
+	void setTargetsButtonsHiddenState(QButtonGroup *targetButtonGroup, bool hidden);
+	void updateTargetsGroupBoxHiddenState();
 
-			bool selectionTargetOnlyMode() const;
-			bool translationMode() const;
+	void createLineTargetsButtonGroup();
+	void createTextTargetsButtonGroup();
 
-			QGroupBox* createTargetsGroupBox( const QString& title=i18n( "Apply To" ), bool addToLayout=true );
+	virtual void setSelectionTargetOnlyMode(bool value);
+	virtual void setTranslationMode(bool value);
 
-			void setTargetsButtonsHiddenState( QButtonGroup* targetButtonGroup, bool hidden );
-			void updateTargetsGroupBoxHiddenState();
+private:
+	void _setSelectionTargetOnlyMode(bool value, bool force);
+	void _setTranslationMode(bool enabled, bool force);
 
-			void createLineTargetsButtonGroup();
-			void createTextTargetsButtonGroup();
+private slots:
+	void onDefaultButtonClicked();
 
-			virtual void setSelectionTargetOnlyMode( bool value );
-			virtual void setTranslationMode( bool value );
+protected:
+	QGroupBox *m_targetGroupBox;
+	QGridLayout *m_targetLayout;
 
-		private:
+	QButtonGroup *m_lineTargetsButtonGroup;
+	QButtonGroup *m_textTargetsButtonGroup;
 
-			void _setSelectionTargetOnlyMode( bool value, bool force );
-			void _setTranslationMode( bool enabled, bool force );
+private:
+	bool m_selectionTargetOnlyMode;
+	bool m_selectionTargetWasChecked;
 
-		private slots:
+	bool m_translationMode;
+	Subtitle::TextTarget m_nonTranslationModeTarget;
+};
 
-			void onDefaultButtonClicked();
+class ActionWithLinesTargetDialog : public ActionWithTargetDialog
+{
+	Q_OBJECT
 
-		protected:
+public:
+	explicit ActionWithLinesTargetDialog(const QString &title, QWidget *parent = 0);
+	ActionWithLinesTargetDialog(const QString &title, const QString &desc, QWidget *parent = 0);
 
-			QGroupBox* m_targetGroupBox;
-			QGridLayout* m_targetLayout;
+public slots:
+	virtual int exec();
+};
 
-			QButtonGroup* m_lineTargetsButtonGroup;
-			QButtonGroup* m_textTargetsButtonGroup;
+class ActionWithTextsTargetDialog : public ActionWithTargetDialog
+{
+	Q_OBJECT
 
-		private:
+public:
+	explicit ActionWithTextsTargetDialog(const QString &title, QWidget *parent = 0);
+	ActionWithTextsTargetDialog(const QString &title, const QString &desc, QWidget *parent = 0);
 
-			bool m_selectionTargetOnlyMode;
-			bool m_selectionTargetWasChecked;
+public slots:
+	virtual int exec();
+};
 
-			bool m_translationMode;
-			Subtitle::TextTarget m_nonTranslationModeTarget;
-	};
+class ActionWithLinesAndTextsTargetDialog : public ActionWithTargetDialog
+{
+	Q_OBJECT
 
+public:
+	explicit ActionWithLinesAndTextsTargetDialog(const QString &title, QWidget *parent = 0);
+	ActionWithLinesAndTextsTargetDialog(const QString &title, const QString &desc, QWidget *parent = 0);
 
-	class ActionWithLinesTargetDialog : public ActionWithTargetDialog
-	{
-		Q_OBJECT
-
-		public:
-
-			explicit ActionWithLinesTargetDialog( const QString& title, QWidget* parent=0 );
-			ActionWithLinesTargetDialog( const QString& title, const QString& desc, QWidget* parent=0 );
-
-		public slots:
-
-			virtual int exec();
-	};
-
-	class ActionWithTextsTargetDialog : public ActionWithTargetDialog
-	{
-		Q_OBJECT
-
-		public:
-
-			explicit ActionWithTextsTargetDialog( const QString& title, QWidget* parent=0 );
-			ActionWithTextsTargetDialog( const QString& title, const QString& desc, QWidget* parent=0 );
-
-		public slots:
-
-			virtual int exec();
-	};
-
-	class ActionWithLinesAndTextsTargetDialog : public ActionWithTargetDialog
-	{
-		Q_OBJECT
-
-		public:
-
-			explicit ActionWithLinesAndTextsTargetDialog( const QString& title, QWidget* parent=0 );
-			ActionWithLinesAndTextsTargetDialog( const QString& title, const QString& desc, QWidget* parent=0 );
-
-		public slots:
-
-			virtual int exec();
-	};
-
+public slots:
+	virtual int exec();
+};
 }
-
 #endif

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "subtitleline.h"
@@ -32,71 +32,65 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class SubtitleIterator : public QObject
 {
-	class SubtitleIterator : public QObject
-	{
-		Q_OBJECT
+	Q_OBJECT
+	Q_PROPERTY(int index READ index WRITE toIndex);
 
-		Q_PROPERTY( int index READ index WRITE toIndex );
+public:
+	static const int AfterLast = -1;
+	static const int BehindFirst = -2;
+	static const int Invalid = -3;
 
-		public:
+	explicit SubtitleIterator(const Subtitle &subtitle, const RangeList &ranges = Range::full(), bool toLast = false);
+	SubtitleIterator(const SubtitleIterator &it);
+	SubtitleIterator & operator=(const SubtitleIterator &it);
+	virtual ~SubtitleIterator();
 
-			static const int AfterLast = -1;
-			static const int BehindFirst = -2;
-			static const int Invalid = -3;
+	bool isAutoSync() const;
+	void setAutoSync(bool value);
 
-			explicit SubtitleIterator( const Subtitle& subtitle, const RangeList& ranges=Range::full(), bool toLast=false );
-			SubtitleIterator( const SubtitleIterator& it );
-			SubtitleIterator& operator=( const SubtitleIterator& it );
-			virtual ~SubtitleIterator();
+	bool isAutoCircle() const;
+	void setAutoCircle(bool value);
 
-			bool isAutoSync() const;
-			void setAutoSync( bool value );
+	bool isFullIterator() const;
+	RangeList ranges() const;
 
-			bool isAutoCircle() const;
-			void setAutoCircle( bool value );
+	void toFirst();
+	void toLast();
+	bool toIndex(int index);
 
-			bool isFullIterator() const;
-			RangeList ranges() const;
+	inline int index() { return m_index; }
+	inline int firstIndex() { return m_index == Invalid ? -1 : m_ranges.firstIndex(); }
+	inline int lastIndex() { return m_index == Invalid ? -1 : m_ranges.lastIndex(); }
 
-			void toFirst();
-			void toLast();
-			bool toIndex( int index );
+	inline SubtitleLine * current() const { return m_index < 0 ? 0 : *m_linesIterator; }
+	inline operator SubtitleLine *() const { return m_index < 0 ? 0 : *m_linesIterator; }
 
-			inline int index() { return m_index; }
-			inline int firstIndex() { return m_index == Invalid ? -1 : m_ranges.firstIndex(); }
-			inline int lastIndex() { return m_index == Invalid ? -1 : m_ranges.lastIndex(); }
+	SubtitleIterator & operator++();
+	SubtitleIterator & operator+=(int steps);
+	SubtitleIterator & operator--();
+	SubtitleIterator & operator-=(int steps);
 
-			inline SubtitleLine* current() const { return m_index < 0 ? 0 : *m_linesIterator; }
-			inline operator SubtitleLine*() const { return m_index < 0 ? 0 : *m_linesIterator; }
+signals:
+	void syncronized(int firstIndex, int lastIndex, bool inserted);
 
-			SubtitleIterator& operator++();
-			SubtitleIterator& operator+=( int steps );
-			SubtitleIterator& operator--();
-			SubtitleIterator& operator-=( int steps );
+private slots:
+	void onSubtitleLinesInserted(int firstIndex, int lastIndex);
+	void onSubtitleLinesRemoved(int firstIndex, int lastIndex);
 
-		signals:
-
-			void syncronized( int firstIndex, int lastIndex, bool inserted );
-
-		private slots:
-
-			void onSubtitleLinesInserted( int firstIndex, int lastIndex );
-			void onSubtitleLinesRemoved( int firstIndex, int lastIndex );
-
-		private:
-
-			const Subtitle* m_subtitle;
-			bool m_autoSync;
-			bool m_autoCircle;
-			RangeList m_ranges;
-			bool m_isFullIterator;
-			int m_index;
-			RangeList::ConstIterator m_rangesIterator;
-			QList<SubtitleLine*>::Iterator m_linesIterator;
-			QList<SubtitleLine*>::Iterator m_linesIteratorStart;
-	};
+private:
+	const Subtitle *m_subtitle;
+	bool m_autoSync;
+	bool m_autoCircle;
+	RangeList m_ranges;
+	bool m_isFullIterator;
+	int m_index;
+	RangeList::ConstIterator m_rangesIterator;
+	QList<SubtitleLine *>::Iterator m_linesIterator;
+	QList<SubtitleLine *>::Iterator m_linesIteratorStart;
+};
 }
 
 #endif

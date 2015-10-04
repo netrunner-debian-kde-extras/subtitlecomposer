@@ -21,33 +21,29 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-	#include <config.h>
+#include <config.h>
 #endif
 
 #include "actionwithtargetdialog.h"
 
 class QCheckBox;
 
-namespace SubtitleComposer
+namespace SubtitleComposer {
+class FixPunctuationDialog : public ActionWithTargetDialog
 {
-	class FixPunctuationDialog : public ActionWithTargetDialog
-	{
-		public:
+public:
+	FixPunctuationDialog(QWidget *parent = 0);
 
-			FixPunctuationDialog( QWidget* parent=0 );
+	bool spaces() const;
+	bool quotes() const;
+	bool englishI() const;
+	bool ellipisis() const;
 
-			bool spaces() const;
-			bool quotes() const;
-			bool englishI() const;
-			bool ellipisis() const;
-
-		private:
-
-			QCheckBox* m_spacesCheckBox;
-			QCheckBox* m_quotesCheckBox;
-			QCheckBox* m_englishICheckBox;
-			QCheckBox* m_ellipsisCheckBox;
-	};
+private:
+	QCheckBox *m_spacesCheckBox;
+	QCheckBox *m_quotesCheckBox;
+	QCheckBox *m_englishICheckBox;
+	QCheckBox *m_ellipsisCheckBox;
+};
 }
-
 #endif

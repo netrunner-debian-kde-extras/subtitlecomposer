@@ -6,6 +6,7 @@ Uploaders: Maximiliano Curia <maxy@debian.org>
 Build-Depends: debhelper (>= 9), cmake, pkg-kde-tools,
  kdelibs5-dev, libgstreamer-plugins-base1.0-dev, libglib2.0-dev, libxml2-dev,
  libxine2-dev, libx11-dev
+Build-Conflicts: qt5-default
 Standards-Version: 3.9.4
 Homepage: http://sourceforge.net/projects/subcomposer
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-kde/kde-extras/subtitlecomposer.git

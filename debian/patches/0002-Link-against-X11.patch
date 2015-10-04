@@ -1,15 +1,26 @@
---- a/src/player/xine/CMakeLists.txt
-+++ b/src/player/xine/CMakeLists.txt
+From: =?utf-8?q?Jos=C3=A9_Manuel_Santamar=C3=ADa_Lema?= <panfaust@gmail.com>
+Date: Mon, 14 Oct 2013 15:29:39 +0200
+Subject: Link against X11
+
+---
+ src/services/xine/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/services/xine/CMakeLists.txt b/src/services/xine/CMakeLists.txt
+index fc873eb..504cd77 100644
+--- a/src/services/xine/CMakeLists.txt
++++ b/src/services/xine/CMakeLists.txt
 @@ -1,3 +1,5 @@
 +find_package(X11)
 +
- SET( players_xine_INCLUDE_DIR
+ SET( services_xine_INCLUDE_DIR
  	${XINE_INCLUDE_DIR}
  	CACHE INTERNAL EXPORTEDVARIABLE
-@@ -10,6 +12,7 @@ SET( players_xine_DEFS
+@@ -10,7 +12,7 @@ SET( services_xine_DEFS
  
- SET( players_xine_LIBS
+ SET( services_xine_LIBS
  	${XINE_LIBRARY}
+-	-lX11
 +	${X11_LIBRARIES}
  	CACHE INTERNAL EXPORTEDVARIABLE
  )

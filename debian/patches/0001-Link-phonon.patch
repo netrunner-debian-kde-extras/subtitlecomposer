@@ -1,11 +1,20 @@
-# Description: This pacth adds a missing link against Phonon.
-#  Without this patch the package will FTBFS with binutils-gold.
-# Forwarded: not-needed
-# Author: José Manuel Santamaría Lema <panfaust@gmail.com>
-# 
---- subtitlecomposer-0.5.3.orig/src/player/phonon/CMakeLists.txt
-+++ subtitlecomposer-0.5.3/src/player/phonon/CMakeLists.txt
-@@ -4,3 +4,7 @@
+From: =?utf-8?q?Jos=C3=A9_Manuel_Santamar=C3=ADa_Lema?= <panfaust@gmail.com>
+Date: Fri, 13 Nov 2009 18:36:09 +0000
+Subject: Link phonon
+
+This patch adds a missing link against Phonon.
+Without this patch the package will FTBFS with binutils-gold.
+
+Forwarded: not-needed
+---
+ src/services/phonon/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/services/phonon/CMakeLists.txt b/src/services/phonon/CMakeLists.txt
+index 96a3951..ee0d22a 100644
+--- a/src/services/phonon/CMakeLists.txt
++++ b/src/services/phonon/CMakeLists.txt
+@@ -4,3 +4,7 @@ SET( services_phonon_SRCS
  	CACHE INTERNAL EXPORTEDVARIABLE
  )
  

@@ -15,7 +15,7 @@ Vcs-Git: git://anonscm.debian.org/pkg-kde/kde-extras/subtitlecomposer.git
 Package: subtitlecomposer
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xine-x:Depends}
-Suggests: mplayer
+Suggests: mplayer2
 Description: Subtitles editor for KDE
  A text-based subtitles editor for KDE supporting basic operations (text,
  time and style edition), realtime previewing and spell checking. Other

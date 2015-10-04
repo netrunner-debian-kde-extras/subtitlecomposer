@@ -1,0 +1,63 @@
+From: =?utf-8?q?Martin_Stegh=C3=B6fer?= <martin@steghoefer.eu>
+Date: Sun, 4 Oct 2015 19:02:50 +0200
+Subject: Find platform-dependant include files of GStreamer
+
+In the current -dev packages of GStreamer 1.x in Debian, the file
+"gst/gstconfig.h" is not in the same directory as the rest of the
+includes, but in a subdirectory of the library directory. However,
+the FindGStreamer.cmake file of Subtitlecomposer is only looking
+for a single include directory per component, based on the location
+of a single reference file. This patch adds the subdirectory
+"gstreamer-1.0/include" of the library dir of a component to the
+include dirs variable of the same component. This way, platform-
+dependant files like "gst/gstconfig.h" will be found, too.
+
+Forwarding is not needed, because upstream has moved on from using
+the FindGStreamer.cmake.
+
+Forwarded: not-needed
+---
+ src/services/FindGStreamer.cmake | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/src/services/FindGStreamer.cmake b/src/services/FindGStreamer.cmake
+index bf25d30..0dcc473 100644
+--- a/src/services/FindGStreamer.cmake
++++ b/src/services/FindGStreamer.cmake
+@@ -67,6 +67,14 @@ macro(FIND_GSTREAMER_COMPONENT _component_prefix _pkgconfig_name _header _librar
+ 		NAMES ${_library}
+ 		HINTS ${PC_${_component_prefix}_LIBRARY_DIRS} ${PC_${_component_prefix}_LIBDIR}
+ 	)
++	
++	# Add the "gstreamer-1.0/include" sub directory of the lib path to the list of include folders
++	# (in order to be able to resolve "gst/gstconfig.h")
++	if(${_component_prefix}_LIBRARIES)
++	    list(GET ${_component_prefix}_LIBRARIES 0 FIRST_LIBRARY)
++		get_filename_component(${_component_prefix}_LIBRARY_DIR ${FIRST_LIBRARY} DIRECTORY)
++		list(APPEND ${_component_prefix}_INCLUDE_DIRS "${${_component_prefix}_LIBRARY_DIR}/gstreamer-1.0/include")
++	endif()
+ endmacro()
+ 
+ # ------------------------
+@@ -79,8 +87,9 @@ FIND_GSTREAMER_COMPONENT(GSTREAMER_BASE gstreamer-base-1.0 gst/base/gstadapter.h
+ 
+ # 1.2. Check GStreamer version
+ if (GSTREAMER_INCLUDE_DIRS)
+-	if (EXISTS "${GSTREAMER_INCLUDE_DIRS}/gst/gstversion.h")
+-		file(READ "${GSTREAMER_INCLUDE_DIRS}/gst/gstversion.h" GSTREAMER_VERSION_CONTENTS)
++	foreach (GS_INCLUDE_DIR IN LISTS GSTREAMER_INCLUDE_DIRS)
++	  if (EXISTS "${GS_INCLUDE_DIR}/gst/gstversion.h")
++		file(READ "${GS_INCLUDE_DIR}/gst/gstversion.h" GSTREAMER_VERSION_CONTENTS)
+ 
+ 		string(REGEX MATCH "#define +GST_VERSION_MAJOR +\\(([0-9]+)\\)" _dummy "${GSTREAMER_VERSION_CONTENTS}")
+ 		set(GSTREAMER_VERSION_MAJOR "${CMAKE_MATCH_1}")
+@@ -92,7 +101,8 @@ if (GSTREAMER_INCLUDE_DIRS)
+ 		set(GSTREAMER_VERSION_MICRO "${CMAKE_MATCH_1}")
+ 
+ 		set(GSTREAMER_VERSION "${GSTREAMER_VERSION_MAJOR}.${GSTREAMER_VERSION_MINOR}.${GSTREAMER_VERSION_MICRO}")
+-	endif ()
++	  endif ()
++	endforeach (GS_INCLUDE_DIR)
+ endif ()
+ 
+ if ("${GStreamer_FIND_VERSION}" VERSION_GREATER "${GSTREAMER_VERSION}")

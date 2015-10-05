@@ -1,3 +1,4 @@
 0001-Link-phonon.patch
 0002-Link-against-X11.patch
 0003-Find-platform-dependant-include-files-of-GStreamer.patch
+0004-Fix-crash-Sonnet-Dialog-cannot-handle-empty-buffers.patch

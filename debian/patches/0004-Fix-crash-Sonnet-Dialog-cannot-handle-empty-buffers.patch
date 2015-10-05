@@ -1,0 +1,59 @@
+From: =?utf-8?q?Martin_Stegh=C3=B6fer?= <martin@steghoefer.eu>
+Date: Mon, 5 Oct 2015 21:19:14 +0200
+Subject: Fix crash: Sonnet::Dialog cannot handle empty buffers.
+
+Subtitle Composer crashes on spell checking an empty subtitle.
+
+Apparently this is a general problem of Sonnet::Dialog, which cannot handle
+empty buffers. I was able to reproduce the crash outside of Subtitle Composer
+in an isolated example by passing an empty buffer to Sonnet::Dialog.
+
+Sonnet::Dialog's specification doesn't exclude empty buffers, so I consider
+this a bug in Sonnet. But even so, it might be good to work around this problem
+in Subtitle Composer, too. Even the KDE people themselves (the creators of
+Sonnet) apply that kind of workaround in their applications
+(e.g. in Kate [1] [2]).
+
+The workaround simply skips empty entries because they don't have to be
+checked anyway.
+
+Forwarding of the patch is not needed because upstream has ported the
+application to KF5, which doesn't show the problem any more.
+
+[1] https://bugs.kde.org/show_bug.cgi?id=228789
+[2] https://websvn.kde.org/trunk/KDE/kdelibs/kate/spellcheck/spellcheckdialog.cpp?r1=1103086&r2=1103085&pathrev=1103086
+
+Bug-Debian: https://bugs.debian.org/694812
+Forwarded: not-needed
+---
+ src/main/utils/speller.cpp | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/main/utils/speller.cpp b/src/main/utils/speller.cpp
+index 38bf100..e849541 100644
+--- a/src/main/utils/speller.cpp
++++ b/src/main/utils/speller.cpp
+@@ -110,14 +110,18 @@ Speller::onBufferDone()
+ {
+ 	// NOTE: not setting the buffer in this slots closes the dialog
+ 
+-	if(advance()) {
++	QString newBuffer;
++	while(newBuffer.isEmpty() && advance()) {
+ 		if(m_translationMode) {
+ 			m_feedPrimaryNext = !m_feedPrimaryNext;
+-			m_sonnetDialog->setBuffer(m_feedPrimaryNext ? m_iterator->current()->secondaryText().string() : m_iterator->current()->primaryText().string()
+-			                          );
+-		} else
+-			m_sonnetDialog->setBuffer(m_iterator->current()->primaryText().string());
++			newBuffer = m_feedPrimaryNext ? m_iterator->current()->secondaryText().string() : m_iterator->current()->primaryText().string();
++		} else {
++			newBuffer = m_iterator->current()->primaryText().string();
++		}
+ 	}
++
++	if(!newBuffer.isEmpty())
++		m_sonnetDialog->setBuffer(newBuffer);
+ }
+ 
+ bool

@@ -3,6 +3,21 @@ subtitlecomposer (0.5.7-1) unstable; urgency=medium
   [ Martin Steghöfer ]
   * Imported Upstream version 0.5.7 (Closes: #571687, #704067, #776326,
     #799957).
+  * Dropped patches regarding bugs that are already fixed in the new upstream version.
+  * Rebased remaining patches onto new upstream version.
+  * Updated debian/watch to new repository location.
+  * The new upstream version needs GStreamer 1.x. (Closes: #785853)
+  * Patched FindGStreamer.cmake, so it finds gst/gstconfig.h in the Debian directory layout.
+  * Declared build conflict with Qt5. (Closes: #784075)
+  * Suggest "mplayer2" instead of "mplayer". (Closes: #686167)
+  * Removed lintian override that is both malformed (lintian complains about the override itself)
+    and obsolete (lintian accepts a Build-Depends on "libxine2-dev").
+  * Bumped Standards-Version to 3.9.6 (no changes necessary according to upgrading checklist).
+  * Fix crash on spell checking an empty subtitle entry. (Closes: #694812)
+
+  [ Maximiliano Curia ]
+  * Migrate copyright file to copyright 1.0.
+  * Update watch file.
 
  -- Maximiliano Curia <maxy@debian.org>  Fri, 16 Oct 2015 11:33:42 +0200
 
